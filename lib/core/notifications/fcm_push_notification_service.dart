@@ -1,0 +1,240 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:my_school_teacher/core/notifications/app_notification.dart';
+import 'package:my_school_teacher/core/notifications/push_notification_service.dart';
+
+const _channelId = 'high_importance_channel';
+const _channelName = 'Messages';
+
+const _details = NotificationDetails(
+  android: AndroidNotificationDetails(
+    _channelId,
+    _channelName,
+    channelDescription: 'School notices and updates',
+    importance: Importance.high,
+    priority: Priority.high,
+  ),
+  iOS: DarwinNotificationDetails(),
+);
+
+String _encode(AppNotification notification) => jsonEncode({
+  'title': notification.title,
+  'body': notification.body,
+  'route': notification.route,
+  'data': notification.data,
+});
+
+AppNotification? _decode(String? payload) {
+  if (payload == null) {
+    return null;
+  }
+  try {
+    final map = jsonDecode(payload) as Map<String, dynamic>;
+    return AppNotification(
+      title: map['title'] as String?,
+      body: map['body'] as String?,
+      route: map['route'] as String?,
+      data: Map<String, dynamic>.from(map['data'] as Map? ?? const {}),
+    );
+  } on FormatException {
+    return null;
+  }
+}
+
+/// Runs in a background isolate when an Android data message arrives while the
+/// app is not in the foreground. Notification-bearing messages are displayed by
+/// the OS automatically; data-only messages are shown here.
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  final notification = message.notification;
+  if (notification == null ||
+      (notification.title == null && notification.body == null)) {
+    final plugin = FlutterLocalNotificationsPlugin();
+    await plugin.initialize(
+      settings: const InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        iOS: DarwinInitializationSettings(),
+      ),
+    );
+    await plugin.show(
+      id: message.hashCode,
+      title: message.data['title'] as String?,
+      body: message.data['body'] as String?,
+      notificationDetails: _details,
+      payload: jsonEncode({
+        'title': message.data['title'],
+        'body': message.data['body'],
+        'route': message.data['route'],
+        'data': message.data,
+      }),
+    );
+  }
+}
+
+/// FCM-backed [PushNotificationService]. Owns the Firebase lifecycle and maps
+/// RemoteMessages into [AppNotification] taps.
+class FcmPushNotificationService implements PushNotificationService {
+  FcmPushNotificationService({
+    FirebaseMessaging? messaging,
+    FlutterLocalNotificationsPlugin? localNotifications,
+  }) : _messaging = messaging,
+       _localNotifications =
+           localNotifications ?? FlutterLocalNotificationsPlugin();
+
+  /// Resolved lazily so construction never touches Firebase before
+  /// [Firebase.initializeApp] runs in [init].
+  FirebaseMessaging? _messaging;
+  FirebaseMessaging get _messagingInstance =>
+      _messaging ??= FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _localNotifications;
+  final _taps = StreamController<AppNotification>.broadcast();
+
+  String? _tokenCache;
+  StreamSubscription<String>? _tokenSubscription;
+
+  AppNotification? _launchedByNotification;
+  bool _initialized = false;
+
+  @override
+  Future<void> init() async {
+    if (_initialized) {
+      return;
+    }
+    _initialized = true;
+    await Firebase.initializeApp();
+
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+    const settings = InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      iOS: DarwinInitializationSettings(),
+    );
+    await _localNotifications.initialize(
+      settings: settings,
+      onDidReceiveNotificationResponse: (response) {
+        final notification = _decode(response.payload);
+        if (notification != null) {
+          _taps.add(notification);
+        }
+      },
+    );
+
+    await requestPermission();
+
+    _tokenSubscription = _messagingInstance.onTokenRefresh.listen(
+      (token) => _tokenCache = token,
+    );
+
+    await _warmUpToken();
+
+    FirebaseMessaging.onMessage.listen((message) {
+      _showForegroundNotification(
+        AppNotification.fromMessageMap(message.data),
+      );
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      _taps.add(AppNotification.fromMessageMap(message.data));
+    });
+
+    final initialMessage = await _messagingInstance.getInitialMessage();
+    if (initialMessage != null) {
+      _launchedByNotification = AppNotification.fromMessageMap(
+        initialMessage.data,
+      );
+    }
+  }
+
+  Future<void> _warmUpToken() async {
+    try {
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        var apnsToken = await _messagingInstance.getAPNSToken();
+        if (apnsToken == null) {
+          await Future<void>.delayed(const Duration(seconds: 2));
+          apnsToken = await _messagingInstance.getAPNSToken();
+          if (apnsToken == null) {
+            return;
+          }
+        }
+      }
+      _tokenCache = await _messagingInstance
+          .getToken()
+          .timeout(const Duration(seconds: 10));
+    } on PlatformException {
+      // FirebaseInstallations 403 / APNs errors
+    } on Exception {
+      // Token not ready yet; getToken() will retry on demand
+    }
+  }
+
+  @override
+  Future<bool> requestPermission() async {
+    final settings = await _messagingInstance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.requestNotificationsPermission();
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
+    return settings.authorizationStatus == AuthorizationStatus.authorized;
+  }
+
+  @override
+  Future<String?> getToken() async {
+    final cached = _tokenCache;
+    if (cached != null) {
+      return cached;
+    }
+    try {
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        final apns = await _messagingInstance.getAPNSToken();
+        if (apns == null) {
+          return null;
+        }
+      }
+      final token = await _messagingInstance
+          .getToken()
+          .timeout(const Duration(seconds: 10));
+      _tokenCache = token;
+      return token;
+    } on PlatformException {
+      return null;
+    } on Exception {
+      return null;
+    }
+  }
+
+  @override
+  Stream<AppNotification> get notificationTaps => _taps.stream;
+
+  @override
+  Future<AppNotification?> initialNotification() async =>
+      _launchedByNotification;
+
+  Future<void> _showForegroundNotification(
+    AppNotification notification,
+  ) async {
+    await _localNotifications.show(
+      id: notification.hashCode,
+      title: notification.title,
+      body: notification.body,
+      notificationDetails: _details,
+      payload: _encode(notification),
+    );
+  }
+}

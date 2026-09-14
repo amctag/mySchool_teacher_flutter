@@ -1,0 +1,184 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:my_school_teacher/core/extensions/context_x.dart';
+import 'package:my_school_teacher/core/notifications/push_notification_service.dart';
+import 'package:my_school_teacher/controllers/auth_controller.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+              children: [
+                const SizedBox(height: 12),
+                Center(
+                  child: Container(
+                    width: 112,
+                    height: 112,
+                    decoration: BoxDecoration(
+                      color: context.colors.primary,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: context.colors.primary.withValues(alpha: 0.22),
+                          offset: const Offset(0, 10),
+                          blurRadius: 24,
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: FittedBox(
+                          child: Text(
+                            context.l10n.appName,
+                            textAlign: TextAlign.center,
+                            style: context.textStyles.titleSmall?.copyWith(
+                              color: context.colors.onPrimary,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Text(
+                  context.l10n.welcomeBack,
+                  textAlign: TextAlign.center,
+                  style: context.textStyles.headlineSmall,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  context.l10n.loginSubtitle,
+                  textAlign: TextAlign.center,
+                  style: context.textStyles.bodyLarge?.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 28),
+                TextField(
+                  key: const Key('login_username'),
+                  controller: _usernameController,
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.username],
+                  decoration: InputDecoration(
+                    labelText: context.l10n.username,
+                    prefixIcon: const Icon(Icons.person_outline_rounded),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  key: const Key('login_password'),
+                  controller: _passwordController,
+                  obscureText: _obscurePassword,
+                  textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.password],
+                  onSubmitted: (_) => _submit(),
+                  decoration: InputDecoration(
+                    labelText: context.l10n.password,
+                    prefixIcon: const Icon(Icons.lock_outline_rounded),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() => _obscurePassword = !_obscurePassword);
+                      },
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                      ),
+                    ),
+                  ),
+                ),
+                Consumer<AuthController>(
+                  builder: (context, controller, _) {
+                    final state = controller.state;
+                    final hasError = state.status == AuthStatus.failure;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 180),
+                          child: hasError
+                              ? Padding(
+                                  padding: const EdgeInsets.only(top: 12),
+                                  child: Text(
+                                    state.message ??
+                                        context.l10n.credentialsRequired,
+                                    style: context.textStyles.bodySmall
+                                        ?.copyWith(color: context.colors.error),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                        const SizedBox(height: 20),
+                        FilledButton(
+                          key: const Key('login_submit'),
+                          onPressed: state.status == AuthStatus.loading
+                              ? null
+                              : _submit,
+                          child: state.status == AuthStatus.loading
+                              ? SizedBox.square(
+                                  dimension: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: context.colors.onPrimary,
+                                  ),
+                                )
+                              : Text(context.l10n.signIn),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submit() async {
+    final controller = context.read<AuthController>();
+    String? deviceToken;
+    try {
+      deviceToken = await context.read<PushNotificationService>().getToken();
+    } catch (_) {
+      deviceToken = null;
+    }
+    if (!mounted) {
+      return;
+    }
+    controller.login(
+      _usernameController.text,
+      _passwordController.text,
+      deviceToken: deviceToken,
+    );
+  }
+}

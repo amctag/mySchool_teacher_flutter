@@ -1,0 +1,551 @@
+{
+  "project_info": {
+    "project_number": "756524911884",
+    "firebase_url": "https://koi-beirut.firebaseio.com",
+    "project_id": "koi-beirut",
+    "storage_bucket": "koi-beirut.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:ca942c868bc59594398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.blockstream"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:932500532603b4f3398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.borntodive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:92e1391f3c71a461398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.ihavediscount"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:d5bf51ef0fa07d96398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.koub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:16cbe3220eddc235398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.lta"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:b7545f15a4b11e79398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.myschoolparent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:54fea0ed69186607398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.myschoolteacher"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:a603600671f491bd398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.noga"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:a290af40bba7093d398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.partyto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:94361e3aa8ad1984398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.poincare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:45b0f44960eb9ab3398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.sallura"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:a6aa5a25aa308569398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.salluraapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:8ab7aafb269e366d398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.shabab_news"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:92a949b702be7554398d29",
+        "android_client_info": {
+          "package_name": "com.amctag.sofa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756524911884:android:6f3dfe8ac0430c57398d29",
+        "android_client_info": {
+          "package_name": "com.daleelakappx"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVG6CmruslVcZUdmP1tAffZq6YYahnlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756524911884-o1fd5hll83m2hkvg6t05085jc1qjokb0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "756524911884-0arfc5pd886iuugqkhn8u3lfbfcatduv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.ionic.starter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

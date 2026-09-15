@@ -23,6 +23,17 @@ const _details = NotificationDetails(
   iOS: DarwinNotificationDetails(),
 );
 
+@visibleForTesting
+bool shouldShowLocalForegroundNotification(
+  RemoteMessage message,
+  TargetPlatform platform,
+) {
+  if (platform == TargetPlatform.iOS && message.notification != null) {
+    return false;
+  }
+  return true;
+}
+
 String _encode(AppNotification notification) => jsonEncode({
   'title': notification.title,
   'body': notification.body,
@@ -127,6 +138,13 @@ class FcmPushNotificationService implements PushNotificationService {
     );
 
     await requestPermission();
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      await _messagingInstance.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    }
 
     _tokenSubscription = _messagingInstance.onTokenRefresh.listen(
       (token) => _tokenCache = token,
@@ -135,9 +153,13 @@ class FcmPushNotificationService implements PushNotificationService {
     await _warmUpToken();
 
     FirebaseMessaging.onMessage.listen((message) {
-      _showForegroundNotification(
-        AppNotification.fromMessageMap(message.data),
-      );
+      if (!shouldShowLocalForegroundNotification(
+        message,
+        defaultTargetPlatform,
+      )) {
+        return;
+      }
+      _showForegroundNotification(AppNotification.fromMessageMap(message.data));
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
@@ -164,9 +186,9 @@ class FcmPushNotificationService implements PushNotificationService {
           }
         }
       }
-      _tokenCache = await _messagingInstance
-          .getToken()
-          .timeout(const Duration(seconds: 10));
+      _tokenCache = await _messagingInstance.getToken().timeout(
+        const Duration(seconds: 10),
+      );
     } on PlatformException {
       // FirebaseInstallations 403 / APNs errors
     } on Exception {
@@ -207,9 +229,9 @@ class FcmPushNotificationService implements PushNotificationService {
           return null;
         }
       }
-      final token = await _messagingInstance
-          .getToken()
-          .timeout(const Duration(seconds: 10));
+      final token = await _messagingInstance.getToken().timeout(
+        const Duration(seconds: 10),
+      );
       _tokenCache = token;
       return token;
     } on PlatformException {
@@ -226,9 +248,7 @@ class FcmPushNotificationService implements PushNotificationService {
   Future<AppNotification?> initialNotification() async =>
       _launchedByNotification;
 
-  Future<void> _showForegroundNotification(
-    AppNotification notification,
-  ) async {
+  Future<void> _showForegroundNotification(AppNotification notification) async {
     await _localNotifications.show(
       id: notification.hashCode,
       title: notification.title,

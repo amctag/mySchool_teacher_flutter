@@ -1,5 +1,8 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:my_school_teacher/core/notifications/app_notification.dart';
+import 'package:my_school_teacher/core/notifications/fcm_push_notification_service.dart';
 import 'package:my_school_teacher/core/notifications/noop_push_notification_service.dart';
 
 void main() {
@@ -49,5 +52,54 @@ void main() {
       expect(taps, hasLength(1));
       expect(taps.single.route, 'notices');
     });
+  });
+
+  group('foreground notification display policy', () {
+    test('lets iOS present notification-bearing foreground FCM messages', () {
+      const message = RemoteMessage(
+        notification: RemoteNotification(title: 'New notice', body: 'Open me'),
+        data: {'route': 'notices'},
+      );
+
+      expect(
+        shouldShowLocalForegroundNotification(message, TargetPlatform.iOS),
+        isFalse,
+      );
+    });
+
+    test(
+      'keeps Android foreground messages on the local notification path',
+      () {
+        const message = RemoteMessage(
+          notification: RemoteNotification(
+            title: 'New notice',
+            body: 'Open me',
+          ),
+          data: {'route': 'notices'},
+        );
+
+        expect(
+          shouldShowLocalForegroundNotification(
+            message,
+            TargetPlatform.android,
+          ),
+          isTrue,
+        );
+      },
+    );
+
+    test(
+      'keeps iOS data-only foreground messages on the local notification path',
+      () {
+        const message = RemoteMessage(
+          data: {'title': 'New notice', 'body': 'Open me', 'route': 'notices'},
+        );
+
+        expect(
+          shouldShowLocalForegroundNotification(message, TargetPlatform.iOS),
+          isTrue,
+        );
+      },
+    );
   });
 }

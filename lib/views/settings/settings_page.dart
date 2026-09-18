@@ -46,11 +46,7 @@ class SettingsPage extends StatelessWidget {
                   minTileHeight: 64,
                   leading: const Icon(Icons.translate_rounded),
                   title: Text(context.l10n.language),
-                  subtitle: Text(
-                    locale.languageCode == 'ar'
-                        ? context.l10n.arabic
-                        : context.l10n.english,
-                  ),
+                  subtitle: Text(_languageLabel(context, locale)),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () => AppNavigator.language(context),
                 ),
@@ -101,6 +97,13 @@ class SettingsPage extends StatelessWidget {
       ),
     );
   }
+
+  String _languageLabel(BuildContext context, Locale locale) =>
+      switch (locale.languageCode) {
+        'ar' => context.l10n.arabic,
+        'fr' => context.l10n.french,
+        _ => context.l10n.english,
+      };
 
   String _themeLabel(BuildContext context, ThemeMode mode) => switch (mode) {
     ThemeMode.system => context.l10n.systemTheme,

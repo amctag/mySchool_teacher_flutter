@@ -34,6 +34,12 @@ class LanguagePage extends StatelessWidget {
                   ),
                   const Divider(),
                   RadioListTile(
+                    value: 'fr',
+                    title: Text(context.l10n.french),
+                    secondary: const Text('FR'),
+                  ),
+                  const Divider(),
+                  RadioListTile(
                     value: 'ar',
                     title: Text(context.l10n.arabic),
                     secondary: const Text('AR'),

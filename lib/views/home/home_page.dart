@@ -23,6 +23,11 @@ class HomePage extends StatelessWidget {
         AppNavigator.grades,
       ),
       _HomeTile(
+        context.l10n.attendance,
+        Icons.event_available_rounded,
+        AppNavigator.attendances,
+      ),
+      _HomeTile(
         context.l10n.notices,
         Icons.sticky_note_2_rounded,
         AppNavigator.notices,

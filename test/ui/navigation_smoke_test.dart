@@ -16,8 +16,9 @@ void main() {
     const destinations = [
       'Agenda',
       'Grades',
-      'Notices',
-      'Announcements',
+      'Attendance',
+      'Remarque',
+      'Notice',
       'Activities',
       'Albums',
       'My classes',

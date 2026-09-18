@@ -13,6 +13,7 @@ import 'package:my_school_teacher/models/teacher_class_summary.dart';
 import 'package:my_school_teacher/models/teacher_announcement.dart';
 import 'package:my_school_teacher/models/teacher_media.dart';
 import 'package:my_school_teacher/models/teacher_notice.dart';
+import 'package:my_school_teacher/models/teacher_attendance.dart';
 import 'package:my_school_teacher/models/teacher_schedule.dart';
 
 class TeacherRepository {
@@ -156,6 +157,51 @@ class TeacherRepository {
   Future<void> deleteGradeAssessment(int assessmentId) {
     return _dataSource.deleteGradeAssessment(assessmentId);
   }
+
+  Future<TeacherAttendanceOptions> attendanceOptions({DateTime? date}) async =>
+      TeacherAttendanceOptions.fromJson(
+        await _dataSource.fetchAttendanceOptions(date: date),
+      );
+
+  Future<PagedList<TeacherAttendanceListItem>> attendances({
+    required DateTime date,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final json = await _dataSource.fetchAttendances(
+      date: date,
+      page: page,
+      limit: limit,
+    );
+    final items = ((json['items'] as List<dynamic>?) ?? [])
+        .map(
+          (item) => TeacherAttendanceListItem.fromJson(
+            Map<String, dynamic>.from(item as Map),
+          ),
+        )
+        .toList(growable: false);
+    return PagedList.fromMeta(
+      items: items,
+      pagination: json['pagination'] as Map<String, dynamic>?,
+      fallbackPage: page,
+      fallbackLimit: limit,
+    );
+  }
+
+  Future<TeacherAttendanceSheet> attendanceSheet({
+    required int sectionId,
+    required DateTime date,
+    int? courseId,
+  }) async => TeacherAttendanceSheet.fromJson(
+    await _dataSource.fetchAttendanceSheet(
+      sectionId: sectionId,
+      date: date,
+      courseId: courseId,
+    ),
+  );
+
+  Future<void> saveTeacherAttendance(SaveTeacherAttendanceRequest request) =>
+      _dataSource.saveTeacherAttendance(request);
 
   Future<List<TeacherNotice>> notices() async =>
       (await _dataSource.fetchTeacherNotices())

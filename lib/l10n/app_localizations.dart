@@ -7,6 +7,7 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_ar.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_fr.dart';
 
 // ignore_for_file: type=lint
 
@@ -96,12 +97,13 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
     Locale('en'),
+    Locale('fr'),
   ];
 
   /// No description provided for @appName.
   ///
   /// In en, this message translates to:
-  /// **'My School Teacher'**
+  /// **'MS Teacher'**
   String get appName;
 
   /// No description provided for @schoolName.
@@ -326,6 +328,18 @@ abstract class AppLocalizations {
   /// **'Weekly schedule'**
   String get weeklySchedule;
 
+  /// No description provided for @courses.
+  ///
+  /// In en, this message translates to:
+  /// **'Courses'**
+  String get courses;
+
+  /// No description provided for @noCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'No courses for this class.'**
+  String get noCourses;
+
   /// No description provided for @agenda.
   ///
   /// In en, this message translates to:
@@ -353,13 +367,13 @@ abstract class AppLocalizations {
   /// No description provided for @notices.
   ///
   /// In en, this message translates to:
-  /// **'Notices'**
+  /// **'Remarque'**
   String get notices;
 
   /// No description provided for @noNotices.
   ///
   /// In en, this message translates to:
-  /// **'No notices for this child.'**
+  /// **'No remarques for this child.'**
   String get noNotices;
 
   /// No description provided for @examSchedule.
@@ -377,13 +391,13 @@ abstract class AppLocalizations {
   /// No description provided for @directNotice.
   ///
   /// In en, this message translates to:
-  /// **'Direct notice'**
+  /// **'Direct remarque'**
   String get directNotice;
 
   /// No description provided for @sectionNotice.
   ///
   /// In en, this message translates to:
-  /// **'Section notice'**
+  /// **'Section remarque'**
   String get sectionNotice;
 
   /// No description provided for @publishedOn.
@@ -401,13 +415,13 @@ abstract class AppLocalizations {
   /// No description provided for @announcements.
   ///
   /// In en, this message translates to:
-  /// **'Announcements'**
+  /// **'Notice'**
   String get announcements;
 
   /// No description provided for @announcementDetails.
   ///
   /// In en, this message translates to:
-  /// **'Announcement details'**
+  /// **'Notice details'**
   String get announcementDetails;
 
   /// No description provided for @attendance.
@@ -415,6 +429,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Attendance'**
   String get attendance;
+
+  /// No description provided for @takeAttendance.
+  ///
+  /// In en, this message translates to:
+  /// **'Take attendance'**
+  String get takeAttendance;
+
+  /// No description provided for @noAttendanceRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'No attendance recorded for this date.'**
+  String get noAttendanceRecords;
+
+  /// No description provided for @attendanceViewOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'You can view class attendance. Taking attendance is not enabled for teachers at this school.'**
+  String get attendanceViewOnly;
+
+  /// No description provided for @noEligibleAttendance.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot take attendance for any class today.'**
+  String get noEligibleAttendance;
+
+  /// No description provided for @attendanceDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Attendance date'**
+  String get attendanceDate;
+
+  /// No description provided for @attendanceReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a reason for each absent student.'**
+  String get attendanceReasonRequired;
+
+  /// No description provided for @markAllPresent.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all present'**
+  String get markAllPresent;
+
+  /// No description provided for @absentStudentsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} absent'**
+  String absentStudentsCount(int count);
 
   /// No description provided for @activities.
   ///
@@ -743,7 +805,7 @@ abstract class AppLocalizations {
   /// No description provided for @noAnnouncements.
   ///
   /// In en, this message translates to:
-  /// **'There are no announcements yet.'**
+  /// **'There are no notices yet.'**
   String get noAnnouncements;
 
   /// No description provided for @noActivities.
@@ -871,6 +933,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'English'**
   String get english;
+
+  /// No description provided for @french.
+  ///
+  /// In en, this message translates to:
+  /// **'French'**
+  String get french;
 
   /// No description provided for @arabic.
   ///
@@ -1205,19 +1273,19 @@ abstract class AppLocalizations {
   /// No description provided for @addNotice.
   ///
   /// In en, this message translates to:
-  /// **'Add notice'**
+  /// **'Add remarque'**
   String get addNotice;
 
   /// No description provided for @editNotice.
   ///
   /// In en, this message translates to:
-  /// **'Edit notice'**
+  /// **'Edit remarque'**
   String get editNotice;
 
   /// No description provided for @noNoticesCreated.
   ///
   /// In en, this message translates to:
-  /// **'No notices created yet.'**
+  /// **'No remarques created yet.'**
   String get noNoticesCreated;
 
   /// No description provided for @selectClass.
@@ -1349,7 +1417,7 @@ abstract class AppLocalizations {
   /// No description provided for @noticeContent.
   ///
   /// In en, this message translates to:
-  /// **'Notice content'**
+  /// **'Remarque content'**
   String get noticeContent;
 
   /// No description provided for @save.
@@ -1394,7 +1462,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['ar', 'en'].contains(locale.languageCode);
+      <String>['ar', 'en', 'fr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1407,6 +1475,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsAr();
     case 'en':
       return AppLocalizationsEn();
+    case 'fr':
+      return AppLocalizationsFr();
   }
 
   throw FlutterError(

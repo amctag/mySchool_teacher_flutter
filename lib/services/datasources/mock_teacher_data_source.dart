@@ -91,6 +91,7 @@ class MockTeacherDataSource implements TeacherDataSource {
       'year_title': '2025-2026',
       'stage': 'Primary',
       'primary_course_title': 'Mathematics',
+      'course_titles': ['Mathematics', 'Arabic', 'Science'],
       'is_assigned_to_current_teacher': true,
     },
     {
@@ -288,6 +289,58 @@ class MockTeacherDataSource implements TeacherDataSource {
       {'registration_id': 8, 'student_id': 8, 'score': 10, 'comment': 'Perfect'},
     ],
   };
+
+  final List<Map<String, dynamic>> _attendanceSheets = [
+    {
+      'id': 9001,
+      'date': '2026-09-18',
+      'sectionId': 201,
+      'classLabel': 'Grade 2 - Section A',
+      'courseId': null,
+      'courseTitle': null,
+      'studentCount': 4,
+      'absentCount': 1,
+      'students': [
+        {
+          'studentId': 1,
+          'registrationId': 1,
+          'studentName': 'Eissa Ahmad Khalil',
+          'status': 'present',
+          'attendanceReasonId': null,
+          'attendanceReasonTitle': null,
+          'description': null,
+        },
+        {
+          'studentId': 2,
+          'registrationId': 2,
+          'studentName': 'Lina Moussa',
+          'status': 'absent',
+          'attendanceReasonId': 1,
+          'attendanceReasonTitle': 'Sick',
+          'description': null,
+        },
+        {
+          'studentId': 3,
+          'registrationId': 3,
+          'studentName': 'Omar Nader',
+          'status': 'present',
+          'attendanceReasonId': null,
+          'attendanceReasonTitle': null,
+          'description': null,
+        },
+        {
+          'studentId': 4,
+          'registrationId': 4,
+          'studentName': 'Mira Farah',
+          'status': 'late',
+          'attendanceReasonId': null,
+          'attendanceReasonTitle': null,
+          'description': null,
+        },
+      ],
+    },
+  ];
+  int _nextAttendanceId = 9002;
 
   final List<Map<String, dynamic>> _notices = [
     {
@@ -620,6 +673,184 @@ class MockTeacherDataSource implements TeacherDataSource {
         {'id': 2, 'title': 'Assessment', 'isMain': false},
       ],
     };
+  }
+
+  @override
+  Future<Map<String, dynamic>> fetchAttendanceOptions({DateTime? date}) async {
+    await _pause();
+    return {
+      'attendancePerCourse': false,
+      'classes': [
+        {
+          'id': 2,
+          'name': 'Grade 2',
+          'sections': [
+            {
+              'id': 201,
+              'title': 'A',
+              'courses': [
+                {'id': 11, 'title': 'Mathematics'},
+              ],
+            },
+          ],
+        },
+        {
+          'id': 3,
+          'name': 'Grade 3',
+          'sections': [
+            {
+              'id': 202,
+              'title': 'B',
+              'courses': [
+                {'id': 11, 'title': 'Mathematics'},
+              ],
+            },
+          ],
+        },
+      ],
+      'reasons': [
+        {'id': 1, 'title': 'Sick'},
+        {'id': 2, 'title': 'Family'},
+      ],
+    };
+  }
+
+  @override
+  Future<Map<String, dynamic>> fetchAttendances({
+    required DateTime date,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    await _pause();
+    final day = _dateOnly(date);
+    final filtered = _attendanceSheets
+        .where((item) => item['date'] == day)
+        .map(
+          (item) => {
+            'id': item['id'],
+            'date': item['date'],
+            'sectionId': item['sectionId'],
+            'classLabel': item['classLabel'],
+            'courseId': item['courseId'],
+            'courseTitle': item['courseTitle'],
+            'studentCount': item['studentCount'],
+            'absentCount': item['absentCount'],
+          },
+        )
+        .toList(growable: false);
+    return {
+      'items': filtered,
+      'pagination': {
+        'page': page,
+        'limit': limit,
+        'total': filtered.length,
+        'totalPages': filtered.isEmpty ? 0 : 1,
+      },
+    };
+  }
+
+  @override
+  Future<Map<String, dynamic>> fetchAttendanceSheet({
+    required int sectionId,
+    required DateTime date,
+    int? courseId,
+  }) async {
+    await _pause();
+    final day = _dateOnly(date);
+    Map<String, dynamic>? existing;
+    for (final item in _attendanceSheets) {
+      if (item['sectionId'] == sectionId &&
+          item['date'] == day &&
+          item['courseId'] == courseId) {
+        existing = item;
+        break;
+      }
+    }
+    final classLabel = _classLabel(sectionId);
+    final students = existing == null
+        ? [
+            for (final student in _studentsByClass[sectionId] ?? const [])
+              {
+                'studentId': student['id'],
+                'registrationId': student['id'],
+                'studentName': student['full_name'],
+                'status': 'present',
+                'attendanceReasonId': null,
+                'attendanceReasonTitle': null,
+                'description': null,
+              },
+          ]
+        : List<Map<String, dynamic>>.from(
+            (existing['students'] as List).map(
+              (item) => Map<String, dynamic>.from(item as Map),
+            ),
+          );
+    return {
+      'attendanceId': existing?['id'],
+      'date': day,
+      'sectionId': sectionId,
+      'classLabel': classLabel,
+      'courseId': courseId,
+      'courseTitle': courseId == 11 ? 'Mathematics' : null,
+      'attendancePerCourse': false,
+      'students': students,
+    };
+  }
+
+  @override
+  Future<void> saveTeacherAttendance(
+    SaveTeacherAttendanceRequest request,
+  ) async {
+    await _pause();
+    final day = _dateOnly(request.date);
+    final studentsById = {
+      for (final student in _studentsByClass[request.sectionId] ?? const [])
+        student['id'] as int: student,
+    };
+    final students = [
+      for (final detail in request.details)
+        {
+          'studentId': detail.studentId,
+          'registrationId': detail.studentId,
+          'studentName':
+              studentsById[detail.studentId]?['full_name'] ?? 'Student',
+          'status': detail.status,
+          'attendanceReasonId': detail.attendanceReasonId,
+          'attendanceReasonTitle': detail.attendanceReasonId == 1
+              ? 'Sick'
+              : detail.attendanceReasonId == 2
+              ? 'Family'
+              : null,
+          'description': detail.description,
+        },
+    ];
+    final absentCount = students
+        .where((item) => item['status'] == 'absent')
+        .length;
+    final existingIndex = _attendanceSheets.indexWhere(
+      (item) =>
+          item['sectionId'] == request.sectionId &&
+          item['date'] == day &&
+          item['courseId'] == request.courseId,
+    );
+    final record = {
+      'id': existingIndex >= 0
+          ? _attendanceSheets[existingIndex]['id']
+          : _nextAttendanceId++,
+      'date': day,
+      'sectionId': request.sectionId,
+      'classLabel': _classLabel(request.sectionId),
+      'courseId': request.courseId,
+      'courseTitle': request.courseId == 11 ? 'Mathematics' : null,
+      'studentCount': students.length,
+      'absentCount': absentCount,
+      'students': students,
+    };
+    if (existingIndex >= 0) {
+      _attendanceSheets[existingIndex] = record;
+    } else {
+      _attendanceSheets.add(record);
+    }
   }
 
   @override

@@ -269,6 +269,45 @@ class ApiTeacherDataSource implements TeacherDataSource {
   }
 
   @override
+  Future<Map<String, dynamic>> fetchAttendanceOptions({DateTime? date}) async {
+    final dateQuery = date == null ? '' : '?date=${_dateOnly(date)}';
+    return await _api.get('/teacher/me/attendances/options$dateQuery');
+  }
+
+  @override
+  Future<Map<String, dynamic>> fetchAttendances({
+    required DateTime date,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    return await _api.get(
+      '/teacher/me/attendances?date=${_dateOnly(date)}&page=$page&limit=$limit',
+    );
+  }
+
+  @override
+  Future<Map<String, dynamic>> fetchAttendanceSheet({
+    required int sectionId,
+    required DateTime date,
+    int? courseId,
+  }) async {
+    final courseQuery = courseId == null ? '' : '&courseId=$courseId';
+    return await _api.get(
+      '/teacher/me/attendances/sheet?sectionId=$sectionId&date=${_dateOnly(date)}$courseQuery',
+    );
+  }
+
+  @override
+  Future<void> saveTeacherAttendance(SaveTeacherAttendanceRequest request) async {
+    await _api.post(
+      '/teacher/me/attendances',
+      body: request.toJson(),
+      auth: true,
+    );
+    _api.clearGetCache();
+  }
+
+  @override
   Future<List<Map<String, dynamic>>> fetchTeacherNotices() async {
     return _mapNoticeItems(
       await _api.get('/teacher/me/notices?page=1&limit=20'),
@@ -395,6 +434,7 @@ class ApiTeacherDataSource implements TeacherDataSource {
       'stage': json['stage'],
       'primary_course_title':
           json['primaryCourseTitle'] ?? json['primary_course_title'] ?? '',
+      'course_titles': json['courseTitles'] ?? json['course_titles'] ?? const [],
       'is_assigned_to_current_teacher':
           json['isAssignedToCurrentTeacher'] ??
           json['is_assigned_to_current_teacher'] ??

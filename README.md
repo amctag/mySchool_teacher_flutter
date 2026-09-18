@@ -1,4 +1,4 @@
-# My School Teacher
+# MS Teacher
 
 Flutter Android teacher app for Makarem Preparatory School.
 

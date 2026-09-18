@@ -122,9 +122,42 @@ class _ClassCard extends StatelessWidget {
                       classSummary.label,
                       style: context.textStyles.titleMedium,
                     ),
+                    const SizedBox(height: 6),
+                    if (classSummary.courseTitles.isNotEmpty)
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: [
+                          for (final course in classSummary.courseTitles)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: context.colors.primaryContainer,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                course,
+                                style: context.textStyles.labelSmall?.copyWith(
+                                  color: context.colors.primary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                        ],
+                      )
+                    else if (classSummary.primaryCourseTitle.isNotEmpty)
+                      Text(
+                        classSummary.primaryCourseTitle,
+                        style: context.textStyles.bodySmall?.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
                     const SizedBox(height: 4),
                     Text(
-                      '${classSummary.primaryCourseTitle}\n${classSummary.yearTitle}',
+                      classSummary.yearTitle,
                       style: context.textStyles.bodySmall?.copyWith(
                         color: context.colors.onSurfaceVariant,
                       ),

@@ -95,7 +95,7 @@ class AgendaMonthCalendar extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 7,
-            mainAxisExtent: 34,
+            mainAxisExtent: 44,
           ),
           itemCount: calendarCells,
           itemBuilder: (context, index) {
@@ -161,7 +161,7 @@ class _AgendaCalendarDay extends StatelessWidget {
         customBorder: const CircleBorder(),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(3),
+          padding: const EdgeInsets.all(2),
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: isSelected ? context.colors.primary : null,
@@ -170,33 +170,36 @@ class _AgendaCalendarDay extends StatelessWidget {
                   ? Border.all(color: context.colors.primary, width: 1.5)
                   : null,
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Stack(
+              alignment: Alignment.center,
               children: [
                 Text(
                   '${date.day}',
-                  style: context.textStyles.bodyMedium?.copyWith(
+                  maxLines: 1,
+                  overflow: TextOverflow.visible,
+                  style: context.textStyles.labelLarge?.copyWith(
                     color: foreground,
+                    height: 1,
                     fontWeight: isSelected || isToday
                         ? FontWeight.w700
                         : FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 2),
                 if (hasActivity)
-                  Container(
-                    key: Key('agenda_marker_$_dateKey'),
-                    width: 5,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? context.colors.onPrimary
-                          : context.colors.primary,
-                      shape: BoxShape.circle,
+                  Positioned(
+                    bottom: 3,
+                    child: Container(
+                      key: Key('agenda_marker_$_dateKey'),
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? context.colors.onPrimary
+                            : context.colors.primary,
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                  )
-                else
-                  const SizedBox(width: 5, height: 5),
+                  ),
               ],
             ),
           ),

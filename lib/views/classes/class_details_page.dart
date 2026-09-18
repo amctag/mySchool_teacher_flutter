@@ -77,7 +77,9 @@ class ClassDetailsPage extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  details.summary.primaryCourseTitle,
+                                  details.summary.courseTitles.isNotEmpty
+                                      ? details.summary.courseTitles.join(' · ')
+                                      : details.summary.primaryCourseTitle,
                                   style: context.textStyles.bodySmall
                                       ?.copyWith(
                                         color: context.colors.primary,
@@ -141,78 +143,71 @@ class ClassDetailsPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                _Title(context.l10n.weeklySchedule),
+                _Title(context.l10n.courses),
                 const SizedBox(height: 10),
-                for (final day in details.schedule.days) ...[
-                  Text(day.dayName, style: context.textStyles.titleSmall),
-                  const SizedBox(height: 8),
-                  for (final entry in day.entries)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: SectionCard(
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    entry.courseTitle,
-                                    style: context.textStyles.titleSmall,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(entry.periodLabel),
-                                  const SizedBox(height: 4),
-                                  Text('${entry.startTime} - ${entry.endTime}'),
-                                ],
-                              ),
-                            ),
-                            Text('${context.l10n.room}: ${entry.room}'),
-                          ],
-                        ),
+                if (details.roster.isEmpty &&
+                    details.summary.courseTitles.isEmpty)
+                  SectionCard(
+                    child: Text(
+                      context.l10n.noCourses,
+                      style: context.textStyles.bodyMedium?.copyWith(
+                        color: context.colors.onSurfaceVariant,
                       ),
                     ),
-                  const SizedBox(height: 8),
-                ],
-                const SizedBox(height: 16),
-                _Title(context.l10n.teachers),
-                const SizedBox(height: 10),
-                SectionCard(
-                  child: Column(
-                    children: [
-                      for (
-                        var index = 0;
-                        index < details.roster.length;
-                        index++
-                      ) ...[
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: Icon(
-                            details.roster[index].isCurrentTeacher
-                                ? Icons.star_rounded
-                                : Icons.person_outline_rounded,
-                            color: details.roster[index].isCurrentTeacher
-                                ? context.colors.primary
-                                : context.colors.onSurfaceVariant,
+                  )
+                else if (details.roster.isNotEmpty)
+                  SectionCard(
+                    child: Column(
+                      children: [
+                        for (var index = 0; index < details.roster.length; index++) ...[
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: Icon(
+                              Icons.menu_book_rounded,
+                              color: details.roster[index].isCurrentTeacher
+                                  ? context.colors.primary
+                                  : context.colors.onSurfaceVariant,
+                            ),
+                            title: Text(details.roster[index].courseTitle),
+                            subtitle: details.roster[index].teacherName.isEmpty
+                                ? null
+                                : Text(details.roster[index].teacherName),
+                            trailing: details.roster[index].isCurrentTeacher
+                                ? Text(
+                                    context.l10n.yourAssignment,
+                                    style: context.textStyles.labelMedium
+                                        ?.copyWith(
+                                          color: context.colors.primary,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                  )
+                                : null,
                           ),
-                          title: Text(details.roster[index].teacherName),
-                          subtitle: Text(details.roster[index].courseTitle),
-                          trailing: details.roster[index].isCurrentTeacher
-                              ? Text(
-                                  context.l10n.yourAssignment,
-                                  style: context.textStyles.labelMedium
-                                      ?.copyWith(
-                                        color: context.colors.primary,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                )
-                              : null,
-                        ),
-                        if (index < details.roster.length - 1) const Divider(),
+                          if (index < details.roster.length - 1)
+                            const Divider(),
+                        ],
                       ],
-                    ],
+                    ),
+                  )
+                else
+                  SectionCard(
+                    child: Column(
+                      children: [
+                        for (var index = 0; index < details.summary.courseTitles.length; index++) ...[
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: Icon(
+                              Icons.menu_book_rounded,
+                              color: context.colors.primary,
+                            ),
+                            title: Text(details.summary.courseTitles[index]),
+                          ),
+                          if (index < details.summary.courseTitles.length - 1)
+                            const Divider(),
+                        ],
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           );

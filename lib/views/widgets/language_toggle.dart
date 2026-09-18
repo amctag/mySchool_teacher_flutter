@@ -12,12 +12,16 @@ class LanguageToggle extends StatelessWidget {
     return Consumer<LocaleController>(
       builder: (context, localeController, _) {
         final locale = localeController.state;
-        final code = locale.languageCode == 'ar' ? 'ar' : 'en';
+        final code = LocaleController.supportedLanguageCodes.contains(
+              locale.languageCode,
+            )
+            ? locale.languageCode
+            : 'en';
         final colors = context.colors;
 
         return SizedBox(
           key: const Key('language_dropdown'),
-          width: 148,
+          width: 168,
           child: InputDecorator(
             decoration: InputDecoration(
               isDense: true,
@@ -75,6 +79,14 @@ class LanguageToggle extends StatelessWidget {
                     ),
                   ),
                   DropdownMenuItem(
+                    value: 'fr',
+                    child: Text(
+                      context.l10n.french,
+                      key: const Key('language_fr'),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  DropdownMenuItem(
                     value: 'ar',
                     child: Text(
                       context.l10n.arabic,
@@ -84,7 +96,9 @@ class LanguageToggle extends StatelessWidget {
                   ),
                 ],
                 onChanged: (value) {
-                  if (value == null || value == code) return;
+                  if (value == null || value == code) {
+                    return;
+                  }
                   localeController.setLocale(Locale(value));
                 },
               ),

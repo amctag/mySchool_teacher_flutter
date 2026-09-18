@@ -58,9 +58,7 @@ class ProfilePage extends StatelessWidget {
                 _ProfileRow(
                   icon: Icons.translate_rounded,
                   title: context.l10n.language,
-                  subtitle: locale.languageCode == 'ar'
-                      ? context.l10n.arabic
-                      : context.l10n.english,
+                  subtitle: _languageLabel(context, locale),
                   onTap: () => AppNavigator.language(context),
                 ),
                 const Divider(),
@@ -102,6 +100,13 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+
+  String _languageLabel(BuildContext context, Locale locale) =>
+      switch (locale.languageCode) {
+        'ar' => context.l10n.arabic,
+        'fr' => context.l10n.french,
+        _ => context.l10n.english,
+      };
 
   String _themeLabel(BuildContext context, ThemeMode mode) => switch (mode) {
     ThemeMode.system => context.l10n.systemTheme,

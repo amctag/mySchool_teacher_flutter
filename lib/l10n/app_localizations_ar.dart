@@ -9,7 +9,7 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get appName => 'معلم مدرستي';
+  String get appName => 'MS Teacher';
 
   @override
   String get schoolName => 'مدرسة مكارم الإعدادية';
@@ -128,6 +128,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get weeklySchedule => 'البرنامج الأسبوعي';
 
   @override
+  String get courses => 'المواد';
+
+  @override
+  String get noCourses => 'لا توجد مواد لهذا الصف.';
+
+  @override
   String get agenda => 'المفكرة';
 
   @override
@@ -140,10 +146,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noGrades => 'لا توجد علامات منشورة حتى الآن.';
 
   @override
-  String get notices => 'الإشعارات';
+  String get notices => 'ملاحظة';
 
   @override
-  String get noNotices => 'لا توجد إشعارات لهذا الطالب.';
+  String get noNotices => 'لا توجد ملاحظات لهذا الطالب.';
 
   @override
   String get examSchedule => 'برنامج الامتحان';
@@ -152,10 +158,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noExamSchedule => 'لا يوجد برنامج امتحان منشور.';
 
   @override
-  String get directNotice => 'إشعار مباشر';
+  String get directNotice => 'ملاحظة مباشرة';
 
   @override
-  String get sectionNotice => 'إشعار الشعبة';
+  String get sectionNotice => 'ملاحظة الشعبة';
 
   @override
   String get publishedOn => 'نشر في';
@@ -166,13 +172,40 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get announcements => 'الإعلانات';
+  String get announcements => 'إشعار';
 
   @override
-  String get announcementDetails => 'تفاصيل الإعلان';
+  String get announcementDetails => 'تفاصيل الإشعار';
 
   @override
   String get attendance => 'الحضور';
+
+  @override
+  String get takeAttendance => 'تسجيل الحضور';
+
+  @override
+  String get noAttendanceRecords => 'لا يوجد حضور مسجل لهذا التاريخ.';
+
+  @override
+  String get attendanceViewOnly =>
+      'يمكنك عرض حضور الصف. تسجيل الحضور غير متاح للمعلمين في هذه المدرسة.';
+
+  @override
+  String get noEligibleAttendance => 'لا يمكنك تسجيل الحضور لأي صف اليوم.';
+
+  @override
+  String get attendanceDate => 'تاريخ الحضور';
+
+  @override
+  String get attendanceReasonRequired => 'اختر سبباً لكل طالب غائب.';
+
+  @override
+  String get markAllPresent => 'تعيين الجميع حاضرين';
+
+  @override
+  String absentStudentsCount(int count) {
+    return '$count غائب';
+  }
 
   @override
   String get activities => 'النشاطات';
@@ -342,7 +375,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get agendaAvailable => 'توجد مفكرة';
 
   @override
-  String get noAnnouncements => 'لا توجد إعلانات حتى الآن.';
+  String get noAnnouncements => 'لا توجد إشعارات حتى الآن.';
 
   @override
   String get noActivities => 'لا توجد نشاطات حتى الآن.';
@@ -418,6 +451,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get english => 'الإنجليزية';
+
+  @override
+  String get french => 'الفرنسية';
 
   @override
   String get arabic => 'العربية';
@@ -588,13 +624,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get publishDateLabel => 'تاريخ النشر';
 
   @override
-  String get addNotice => 'إضافة إشعار';
+  String get addNotice => 'إضافة ملاحظة';
 
   @override
-  String get editNotice => 'تعديل الإشعار';
+  String get editNotice => 'تعديل الملاحظة';
 
   @override
-  String get noNoticesCreated => 'لا توجد إشعارات مضافة بعد.';
+  String get noNoticesCreated => 'لا توجد ملاحظات مضافة بعد.';
 
   @override
   String get selectClass => 'اختر الصف';
@@ -661,7 +697,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get targetSection => 'شعبة';
 
   @override
-  String get noticeContent => 'محتوى الإشعار';
+  String get noticeContent => 'محتوى الملاحظة';
 
   @override
   String get save => 'حفظ';

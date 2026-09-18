@@ -81,6 +81,22 @@ abstract interface class TeacherDataSource {
 
   Future<void> deleteGradeAssessment(int assessmentId);
 
+  Future<Map<String, dynamic>> fetchAttendanceOptions({DateTime? date});
+
+  Future<Map<String, dynamic>> fetchAttendances({
+    required DateTime date,
+    int page = 1,
+    int limit = 20,
+  });
+
+  Future<Map<String, dynamic>> fetchAttendanceSheet({
+    required int sectionId,
+    required DateTime date,
+    int? courseId,
+  });
+
+  Future<void> saveTeacherAttendance(SaveTeacherAttendanceRequest request);
+
   Future<List<Map<String, dynamic>>> fetchTeacherNotices();
 
   Future<void> createNotice(UpsertNoticeRequest request);

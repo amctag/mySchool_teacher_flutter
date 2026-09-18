@@ -9,6 +9,8 @@ import 'package:my_school_teacher/controllers/all_class_schedules_controller.dar
 import 'package:my_school_teacher/controllers/change_password_controller.dart';
 import 'package:my_school_teacher/controllers/class_details_controller.dart';
 import 'package:my_school_teacher/controllers/grade_entry_controller.dart';
+import 'package:my_school_teacher/controllers/attendance_entry_controller.dart';
+import 'package:my_school_teacher/controllers/attendances_controller.dart';
 import 'package:my_school_teacher/controllers/grades_controller.dart';
 import 'package:my_school_teacher/controllers/my_classes_controller.dart';
 import 'package:my_school_teacher/controllers/notice_composer_controller.dart';
@@ -16,6 +18,7 @@ import 'package:my_school_teacher/controllers/notices_controller.dart';
 import 'package:my_school_teacher/controllers/schedule_controller.dart';
 import 'package:my_school_teacher/models/account.dart';
 import 'package:my_school_teacher/models/grade_assessment.dart';
+import 'package:my_school_teacher/models/teacher_attendance.dart';
 import 'package:my_school_teacher/models/teacher_announcement.dart';
 import 'package:my_school_teacher/models/teacher_media.dart';
 import 'package:my_school_teacher/models/teacher_agenda_item.dart';
@@ -33,6 +36,8 @@ import 'package:my_school_teacher/views/agenda/agenda_page.dart';
 import 'package:my_school_teacher/views/classes/all_class_schedules_page.dart';
 import 'package:my_school_teacher/views/classes/class_details_page.dart';
 import 'package:my_school_teacher/views/classes/my_classes_page.dart';
+import 'package:my_school_teacher/views/attendance/attendance_entry_page.dart';
+import 'package:my_school_teacher/views/attendance/attendances_page.dart';
 import 'package:my_school_teacher/views/grades/grade_entry_page.dart';
 import 'package:my_school_teacher/views/grades/grades_page.dart';
 import 'package:my_school_teacher/views/notices/notice_editor_page.dart';
@@ -126,6 +131,33 @@ abstract final class AppNavigator {
       ChangeNotifierProvider(
         create: (_) => GradesController(repository: repository)..load(),
         child: const GradesPage(),
+      ),
+    );
+  }
+
+  static Future<void> attendances(BuildContext context) {
+    final repository = _repository(context);
+    return _push(
+      context,
+      ChangeNotifierProvider(
+        create: (_) => AttendancesController(repository: repository)..load(),
+        child: const AttendancesPage(),
+      ),
+    );
+  }
+
+  static Future<void> attendanceEntry(
+    BuildContext context, {
+    TeacherAttendanceListItem? item,
+    DateTime? date,
+  }) {
+    final repository = _repository(context);
+    return _push(
+      context,
+      ChangeNotifierProvider(
+        create: (_) => AttendanceEntryController(repository: repository)
+          ..initialize(item: item, date: date),
+        child: AttendanceEntryPage(item: item),
       ),
     );
   }
@@ -300,6 +332,8 @@ abstract final class AppNavigator {
         await agenda(context);
       case 'grades':
         await grades(context);
+      case 'attendance' || 'attendances':
+        await attendances(context);
       case 'notices' || 'notice':
         await notices(context);
       case 'announcements' || 'announcement':

@@ -85,6 +85,60 @@ class SaveTeacherGradesRequest extends Equatable {
   ];
 }
 
+class StudentAttendanceInput extends Equatable {
+  const StudentAttendanceInput({
+    required this.studentId,
+    required this.status,
+    this.attendanceReasonId,
+    this.description,
+  });
+
+  final int studentId;
+  final String status;
+  final int? attendanceReasonId;
+  final String? description;
+
+  Map<String, dynamic> toJson() => {
+    'studentId': studentId,
+    'status': status,
+    'attendanceReasonId': attendanceReasonId,
+    'description': description,
+  };
+
+  @override
+  List<Object?> get props => [
+    studentId,
+    status,
+    attendanceReasonId,
+    description,
+  ];
+}
+
+class SaveTeacherAttendanceRequest extends Equatable {
+  const SaveTeacherAttendanceRequest({
+    required this.sectionId,
+    required this.date,
+    required this.details,
+    this.courseId,
+  });
+
+  final int sectionId;
+  final int? courseId;
+  final DateTime date;
+  final List<StudentAttendanceInput> details;
+
+  Map<String, dynamic> toJson() => {
+    'sectionId': sectionId,
+    if (courseId != null) 'courseId': courseId,
+    'date':
+        '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
+    'details': details.map((item) => item.toJson()).toList(growable: false),
+  };
+
+  @override
+  List<Object?> get props => [sectionId, courseId, date, details];
+}
+
 class UpsertActivityRequest extends Equatable {
   const UpsertActivityRequest({
     required this.assignmentId,

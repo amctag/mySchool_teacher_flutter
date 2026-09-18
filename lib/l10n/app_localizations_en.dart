@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'My School Teacher';
+  String get appName => 'MS Teacher';
 
   @override
   String get schoolName => 'Makarem Preparatory School';
@@ -136,6 +136,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weeklySchedule => 'Weekly schedule';
 
   @override
+  String get courses => 'Courses';
+
+  @override
+  String get noCourses => 'No courses for this class.';
+
+  @override
   String get agenda => 'Agenda';
 
   @override
@@ -148,10 +154,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noGrades => 'No published grades yet.';
 
   @override
-  String get notices => 'Notices';
+  String get notices => 'Remarque';
 
   @override
-  String get noNotices => 'No notices for this child.';
+  String get noNotices => 'No remarques for this child.';
 
   @override
   String get examSchedule => 'Exam schedule';
@@ -160,10 +166,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noExamSchedule => 'No published exam schedule.';
 
   @override
-  String get directNotice => 'Direct notice';
+  String get directNotice => 'Direct remarque';
 
   @override
-  String get sectionNotice => 'Section notice';
+  String get sectionNotice => 'Section remarque';
 
   @override
   String get publishedOn => 'Published on';
@@ -174,13 +180,42 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get announcements => 'Announcements';
+  String get announcements => 'Notice';
 
   @override
-  String get announcementDetails => 'Announcement details';
+  String get announcementDetails => 'Notice details';
 
   @override
   String get attendance => 'Attendance';
+
+  @override
+  String get takeAttendance => 'Take attendance';
+
+  @override
+  String get noAttendanceRecords => 'No attendance recorded for this date.';
+
+  @override
+  String get attendanceViewOnly =>
+      'You can view class attendance. Taking attendance is not enabled for teachers at this school.';
+
+  @override
+  String get noEligibleAttendance =>
+      'You cannot take attendance for any class today.';
+
+  @override
+  String get attendanceDate => 'Attendance date';
+
+  @override
+  String get attendanceReasonRequired =>
+      'Choose a reason for each absent student.';
+
+  @override
+  String get markAllPresent => 'Mark all present';
+
+  @override
+  String absentStudentsCount(int count) {
+    return '$count absent';
+  }
 
   @override
   String get activities => 'Activities';
@@ -350,7 +385,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get agendaAvailable => 'Agenda available';
 
   @override
-  String get noAnnouncements => 'There are no announcements yet.';
+  String get noAnnouncements => 'There are no notices yet.';
 
   @override
   String get noActivities => 'There are no activities yet.';
@@ -426,6 +461,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get english => 'English';
+
+  @override
+  String get french => 'French';
 
   @override
   String get arabic => 'Arabic';
@@ -596,13 +634,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get publishDateLabel => 'Publish date';
 
   @override
-  String get addNotice => 'Add notice';
+  String get addNotice => 'Add remarque';
 
   @override
-  String get editNotice => 'Edit notice';
+  String get editNotice => 'Edit remarque';
 
   @override
-  String get noNoticesCreated => 'No notices created yet.';
+  String get noNoticesCreated => 'No remarques created yet.';
 
   @override
   String get selectClass => 'Select class';
@@ -670,7 +708,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get targetSection => 'Section';
 
   @override
-  String get noticeContent => 'Notice content';
+  String get noticeContent => 'Remarque content';
 
   @override
   String get save => 'Save';

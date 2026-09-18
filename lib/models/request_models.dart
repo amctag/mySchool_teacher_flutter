@@ -85,6 +85,34 @@ class SaveTeacherGradesRequest extends Equatable {
   ];
 }
 
+class UpsertActivityRequest extends Equatable {
+  const UpsertActivityRequest({
+    required this.assignmentId,
+    required this.classId,
+    required this.title,
+    required this.content,
+    required this.date,
+    this.image,
+  });
+
+  final int assignmentId;
+  final int classId;
+  final String title;
+  final String content;
+  final DateTime date;
+  final String? image;
+
+  @override
+  List<Object?> get props => [
+    assignmentId,
+    classId,
+    title,
+    content,
+    date,
+    image,
+  ];
+}
+
 class UpsertNoticeRequest extends Equatable {
   const UpsertNoticeRequest({
     required this.classId,

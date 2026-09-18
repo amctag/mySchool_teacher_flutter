@@ -15,6 +15,7 @@ class TeacherAgendaItem extends Equatable {
     this.imageLink,
     this.fileLink,
     this.published = false,
+    this.isOwn = true,
   });
 
   factory TeacherAgendaItem.fromJson(Map<String, dynamic> json) {
@@ -40,6 +41,9 @@ class TeacherAgendaItem extends Equatable {
             json['attachmentUrl'],
       ),
       published: json['published'] == true || json['status'] == 1,
+      isOwn: json['is_own'] == true ||
+          json['isOwn'] == true ||
+          (json['is_own'] == null && json['isOwn'] == null),
     );
   }
 
@@ -56,6 +60,7 @@ class TeacherAgendaItem extends Equatable {
   final String? imageLink;
   final String? fileLink;
   final bool published;
+  final bool isOwn;
 
   TeacherAgendaItem copyWith({bool? published}) {
     return TeacherAgendaItem(
@@ -72,6 +77,7 @@ class TeacherAgendaItem extends Equatable {
       imageLink: imageLink,
       fileLink: fileLink,
       published: published ?? this.published,
+      isOwn: isOwn,
     );
   }
 
@@ -98,5 +104,6 @@ class TeacherAgendaItem extends Equatable {
     imageLink,
     fileLink,
     published,
+    isOwn,
   ];
 }

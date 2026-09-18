@@ -23,10 +23,10 @@ void main() {
       preferences: preferences,
     );
 
-    await controller.login('', '');
+    await controller.login(0, '');
 
     expect(controller.state.status, AuthStatus.failure);
-    expect(controller.state.message, 'Username and password are required.');
+    expect(controller.state.message, 'Enter your ID and password.');
   });
 
   test('authenticates teacher and persists session', () async {
@@ -35,7 +35,7 @@ void main() {
       preferences: preferences,
     );
 
-    await controller.login('sara.nasser', 'password123');
+    await controller.login(501, 'password123');
 
     expect(controller.state.status, AuthStatus.authenticated);
     expect(controller.state.account?.username, 'teacher');

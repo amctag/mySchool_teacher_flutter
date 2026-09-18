@@ -188,16 +188,29 @@ class _AgendaCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        StatusBadge(
-                          label: item.published
-                              ? context.l10n.published
-                              : context.l10n.draft,
-                          icon: item.published
-                              ? Icons.public_outlined
-                              : Icons.lock_outline_rounded,
-                          color: item.published
-                              ? const Color(0xFF2E7D32)
-                              : const Color(0xFFF9A825),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            if (item.isOwn)
+                              StatusBadge(
+                                label: context.l10n.you,
+                                icon: Icons.person_rounded,
+                                color: context.colors.primary,
+                              ),
+                            StatusBadge(
+                              label: item.published
+                                  ? context.l10n.published
+                                  : context.l10n.draft,
+                              icon: item.published
+                                  ? Icons.public_outlined
+                                  : Icons.lock_outline_rounded,
+                              color: item.published
+                                  ? const Color(0xFF2E7D32)
+                                  : const Color(0xFFF9A825),
+                            ),
+                          ],
                         ),
                       ],
                     ),

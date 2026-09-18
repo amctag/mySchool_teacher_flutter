@@ -15,7 +15,7 @@ void main() {
   });
 
   test('logs in the seeded teacher account', () async {
-    final account = await repository.login('sara.nasser', 'password123');
+    final account = await repository.login(501, 'password123');
 
     expect(account.fullName, 'Rana Hassan');
     expect(account.title, 'Mathematics Teacher');

@@ -33,16 +33,6 @@ class HomePage extends StatelessWidget {
         AppNavigator.announcements,
       ),
       _HomeTile(
-        context.l10n.activities,
-        Icons.celebration_outlined,
-        AppNavigator.activities,
-      ),
-      _HomeTile(
-        context.l10n.albums,
-        Icons.photo_library_outlined,
-        AppNavigator.albums,
-      ),
-      _HomeTile(
         context.l10n.myClasses,
         Icons.groups_rounded,
         AppNavigator.myClasses,
@@ -51,6 +41,16 @@ class HomePage extends StatelessWidget {
         context.l10n.mySchedule,
         Icons.calendar_view_week_rounded,
         AppNavigator.schedule,
+      ),
+      _HomeTile(
+        context.l10n.activities,
+        Icons.celebration_outlined,
+        AppNavigator.activities,
+      ),
+      _HomeTile(
+        context.l10n.albums,
+        Icons.photo_library_outlined,
+        AppNavigator.albums,
       ),
     ];
 

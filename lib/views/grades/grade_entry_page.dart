@@ -95,76 +95,119 @@ class _GradeEntryPageState extends State<GradeEntryPage> {
               ? coefficient
               : entryContext?.maxGrade;
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
             children: [
               SectionCard(
+                padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
                 child: Column(
                   children: [
-                    AppSelectField<int>(
-                      key: const Key('grade-type'),
-                      label: context.l10n.assessmentType,
-                      value: _valueIn(
-                        state.selectedGradeTypeId,
-                        state.options.gradeTypes.map((item) => item.id),
-                      ),
-                      enabled: widget.assessment == null,
-                      options: [
-                        for (final item in state.options.gradeTypes)
-                          AppSelectOption(value: item.id, label: item.title),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: AppSelectField<int>(
+                            key: const Key('grade-class'),
+                            label: context.l10n.selectClass,
+                            value: _valueIn(
+                              state.selectedClassId,
+                              state.options.classes.map((item) => item.id),
+                            ),
+                            enabled: widget.assessment == null,
+                            options: [
+                              for (final item in state.options.classes)
+                                AppSelectOption(
+                                  value: item.id,
+                                  label: item.name,
+                                ),
+                            ],
+                            onChanged: context
+                                .read<GradeEntryController>()
+                                .selectClass,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: AppSelectField<int>(
+                            key: const Key('grade-section'),
+                            label: context.l10n.selectSection,
+                            value: _valueIn(
+                              state.selectedSectionId,
+                              state.sections.map((item) => item.id),
+                            ),
+                            enabled: widget.assessment == null &&
+                                state.selectedClassId != null,
+                            options: [
+                              for (final item in state.sections)
+                                AppSelectOption(
+                                  value: item.id,
+                                  label: item.title,
+                                ),
+                            ],
+                            onChanged: context
+                                .read<GradeEntryController>()
+                                .selectSection,
+                          ),
+                        ),
                       ],
-                      onChanged:
-                          context.read<GradeEntryController>().selectGradeType,
                     ),
-                    const SizedBox(height: 16),
-                    AppSelectField<int>(
-                      key: const Key('grade-class'),
-                      label: context.l10n.selectClass,
-                      value: _valueIn(
-                        state.selectedClassId,
-                        state.options.classes.map((item) => item.id),
-                      ),
-                      enabled: widget.assessment == null,
-                      options: [
-                        for (final item in state.options.classes)
-                          AppSelectOption(value: item.id, label: item.name),
+                    const SizedBox(height: 10),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: AppSelectField<int>(
+                            key: const Key('grade-course'),
+                            label: context.l10n.selectCourse,
+                            value: _valueIn(
+                              state.selectedCourseId,
+                              state.courses.map((item) => item.id),
+                            ),
+                            enabled: widget.assessment == null &&
+                                state.selectedSectionId != null,
+                            options: [
+                              for (final item in state.courses)
+                                AppSelectOption(
+                                  value: item.id,
+                                  label: item.title,
+                                ),
+                            ],
+                            onChanged: context
+                                .read<GradeEntryController>()
+                                .selectCourse,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: AppSelectField<int>(
+                            key: const Key('grade-type'),
+                            label: context.l10n.assessmentType,
+                            value: _valueIn(
+                              state.selectedGradeTypeId,
+                              state.options.gradeTypes.map((item) => item.id),
+                            ),
+                            enabled: widget.assessment == null &&
+                                state.canChooseAssessmentType,
+                            options: [
+                              for (final item in state.options.gradeTypes)
+                                AppSelectOption(
+                                  value: item.id,
+                                  label: item.title,
+                                  enabled: widget.assessment != null ||
+                                      !state.isGradeTypeUsed(item.id),
+                                  subtitle: widget.assessment == null &&
+                                          state.isGradeTypeUsed(item.id)
+                                      ? context.l10n.assessmentAlreadyExists
+                                      : null,
+                                ),
+                            ],
+                            onChanged: context
+                                .read<GradeEntryController>()
+                                .selectGradeType,
+                          ),
+                        ),
                       ],
-                      onChanged: context.read<GradeEntryController>().selectClass,
                     ),
-                    const SizedBox(height: 16),
-                    AppSelectField<int>(
-                      key: const Key('grade-section'),
-                      label: context.l10n.selectSection,
-                      value: _valueIn(
-                        state.selectedSectionId,
-                        state.sections.map((item) => item.id),
-                      ),
-                      enabled: widget.assessment == null &&
-                          state.selectedClassId != null,
-                      options: [
-                        for (final item in state.sections)
-                          AppSelectOption(value: item.id, label: item.title),
-                      ],
-                      onChanged:
-                          context.read<GradeEntryController>().selectSection,
-                    ),
-                    const SizedBox(height: 16),
-                    AppSelectField<int>(
-                      key: const Key('grade-course'),
-                      label: context.l10n.selectCourse,
-                      value: _valueIn(
-                        state.selectedCourseId,
-                        state.courses.map((item) => item.id),
-                      ),
-                      enabled: widget.assessment == null &&
-                          state.selectedSectionId != null,
-                      options: [
-                        for (final item in state.courses)
-                          AppSelectOption(value: item.id, label: item.title),
-                      ],
-                      onChanged:
-                          context.read<GradeEntryController>().selectCourse,
-                    ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -176,7 +219,7 @@ class _GradeEntryPageState extends State<GradeEntryPage> {
                                 : _formatNumber(coefficient),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: isMainType || !canEditSettings
                               ? _MetaLine(
@@ -204,18 +247,35 @@ class _GradeEntryPageState extends State<GradeEntryPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               if (state.status == GradeEntryStatus.loading)
-                const SizedBox(height: 180, child: LoadingView())
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: LoadingView(),
+                )
+              else if (!state.canChooseAssessmentType)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: EmptyView(
+                    icon: Icons.tune_rounded,
+                    message: context.l10n.selectClassSectionCourseFirst,
+                  ),
+                )
               else if (entryContext == null)
-                EmptyView(
-                  icon: Icons.groups_outlined,
-                  message: context.l10n.selectClassSectionCourse,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: EmptyView(
+                    icon: Icons.groups_outlined,
+                    message: context.l10n.selectClassSectionCourse,
+                  ),
                 )
               else if (students.isEmpty)
-                EmptyView(
-                  icon: Icons.grade_rounded,
-                  message: context.l10n.allStudentsAlreadyGraded,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: EmptyView(
+                    icon: Icons.grade_rounded,
+                    message: context.l10n.allStudentsAlreadyGraded,
+                  ),
                 )
               else
                 SectionCard(

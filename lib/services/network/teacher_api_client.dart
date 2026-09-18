@@ -5,10 +5,17 @@ import 'package:my_school_teacher/services/network/api_config.dart';
 import 'package:my_school_teacher/core/persistence/app_preferences.dart';
 
 class TeacherApiException implements Exception {
-  const TeacherApiException(this.message, {this.statusCode});
+  const TeacherApiException(
+    this.message, {
+    this.statusCode,
+    this.accountInactive = false,
+    this.paymentRequired = false,
+  });
 
   final String message;
   final int? statusCode;
+  final bool accountInactive;
+  final bool paymentRequired;
 
   @override
   String toString() => message;

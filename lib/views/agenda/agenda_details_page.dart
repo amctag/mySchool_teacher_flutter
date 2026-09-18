@@ -45,11 +45,13 @@ class _AgendaDetailsPageState extends State<AgendaDetailsPage> {
     return Scaffold(
       appBar: BrandAppBar(
         title: context.l10n.agendaDetails,
-        trailing: HeaderAction(
-          tooltip: context.l10n.editAgenda,
-          icon: Icons.edit_rounded,
-          onPressed: _edit,
-        ),
+        trailing: _item.isOwn
+            ? HeaderAction(
+                tooltip: context.l10n.editAgenda,
+                icon: Icons.edit_rounded,
+                onPressed: _edit,
+              )
+            : null,
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
@@ -153,7 +155,9 @@ class _AgendaDetailsPageState extends State<AgendaDetailsPage> {
           ],
         ],
       ),
-      bottomNavigationBar: Material(
+      bottomNavigationBar: !_item.isOwn
+          ? null
+          : Material(
         color: context.colors.surface,
         child: SafeArea(
           child: Padding(

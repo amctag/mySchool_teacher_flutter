@@ -342,12 +342,17 @@ class MockTeacherDataSource implements TeacherDataSource {
   final List<Map<String, dynamic>> _activities = [
     {
       'id': 9101,
+      'assignmentId': 0,
+      'classId': 0,
       'title': 'Science fair',
       'content': 'Students present their science projects in the hall.',
       'date': '2026-09-20',
       'image': '',
       'isGlobal': true,
       'scopeLabel': 'All school',
+      'classLabel': null,
+      'courseTitle': null,
+      'isOwn': false,
     },
   ];
 
@@ -772,6 +777,26 @@ class MockTeacherDataSource implements TeacherDataSource {
   }
 
   @override
+  Future<void> createActivity(UpsertActivityRequest request) async {
+    await _pause();
+    _activities.insert(0, {
+      'id': 9100 + _activities.length + 1,
+      'assignmentId': request.assignmentId,
+      'classId': request.classId,
+      'title': request.title,
+      'content': request.content,
+      'date':
+          '${request.date.year.toString().padLeft(4, '0')}-${request.date.month.toString().padLeft(2, '0')}-${request.date.day.toString().padLeft(2, '0')}',
+      'image': request.image ?? '',
+      'isGlobal': false,
+      'scopeLabel': 'Class ${request.classId}',
+      'classLabel': 'Class ${request.classId}',
+      'courseTitle': null,
+      'isOwn': true,
+    });
+  }
+
+  @override
   Future<List<Map<String, dynamic>>> fetchTeacherAlbums() async {
     await _pause();
     return _copyList(_albums);
@@ -809,22 +834,38 @@ class MockTeacherDataSource implements TeacherDataSource {
 
   @override
   Future<Map<String, dynamic>> login(
-    String username,
+    int id,
     String password, {
     String? deviceToken,
   }) async {
     await _pause();
-    final identifier = username.trim().toLowerCase();
-    final allowedUsernames = {
-      'teacher',
-      'sara.nasser',
-    };
+    final allowedIds = {501, 1};
     final allowedPasswords = {_password, 'password123', 'restored-session'};
-    if (allowedUsernames.contains(identifier) &&
-        allowedPasswords.contains(password)) {
+    if (allowedIds.contains(id) && allowedPasswords.contains(password)) {
       return Map<String, dynamic>.from(_teacher);
     }
-    throw Exception('Invalid username or password.');
+    throw Exception('Invalid ID or password.');
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchSupportSchools(int id) async {
+    await _pause();
+    if (id < 1) {
+      throw Exception('Enter your ID.');
+    }
+    return [
+      {
+        'schoolName': 'Makarem Preparatory School',
+        'telephone': '+961 1 234 567',
+        'phone': '+961 70 123 456',
+        'fax': '+961 1 234 568',
+        'address': 'Main Street, Beirut',
+        'email': 'support@makarem.edu',
+        'website': 'https://makarem.edu',
+        'about': 'School support desk',
+        'logo': '',
+      },
+    ];
   }
 
   @override

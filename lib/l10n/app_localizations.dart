@@ -140,11 +140,83 @@ abstract class AppLocalizations {
   /// **'Sign in'**
   String get signIn;
 
+  /// No description provided for @support.
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get support;
+
+  /// No description provided for @supportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact your school for help with your account.'**
+  String get supportSubtitle;
+
+  /// No description provided for @supportId.
+  ///
+  /// In en, this message translates to:
+  /// **'ID'**
+  String get supportId;
+
+  /// No description provided for @supportIdRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your ID to contact support.'**
+  String get supportIdRequired;
+
+  /// No description provided for @supportNoSchools.
+  ///
+  /// In en, this message translates to:
+  /// **'No school contact details were found for this ID.'**
+  String get supportNoSchools;
+
+  /// No description provided for @supportLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load school support details.'**
+  String get supportLoadFailed;
+
+  /// No description provided for @supportLookup.
+  ///
+  /// In en, this message translates to:
+  /// **'Find school contact'**
+  String get supportLookup;
+
   /// No description provided for @credentialsRequired.
   ///
   /// In en, this message translates to:
-  /// **'Enter your username and password.'**
+  /// **'Enter your ID and password.'**
   String get credentialsRequired;
+
+  /// No description provided for @accountInactiveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot sign in'**
+  String get accountInactiveTitle;
+
+  /// No description provided for @accountInactiveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is inactive. You cannot log in. Contact support for help.'**
+  String get accountInactiveBody;
+
+  /// No description provided for @accountUnpaidTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot sign in'**
+  String get accountUnpaidTitle;
+
+  /// No description provided for @accountUnpaidBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment is required for this account. You cannot log in. Contact support for help.'**
+  String get accountUnpaidBody;
+
+  /// No description provided for @contactSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact support'**
+  String get contactSupport;
 
   /// No description provided for @home.
   ///
@@ -632,6 +704,12 @@ abstract class AppLocalizations {
   /// **'Draft'**
   String get draft;
 
+  /// No description provided for @you.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get you;
+
   /// No description provided for @image.
   ///
   /// In en, this message translates to:
@@ -980,6 +1058,24 @@ abstract class AppLocalizations {
   /// **'Add agenda'**
   String get addAgenda;
 
+  /// No description provided for @addActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Add activity'**
+  String get addActivity;
+
+  /// No description provided for @activityDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity date'**
+  String get activityDate;
+
+  /// No description provided for @activityContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity details'**
+  String get activityContent;
+
   /// No description provided for @editAgenda.
   ///
   /// In en, this message translates to:
@@ -1045,6 +1141,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All students already have grades for this assessment.'**
   String get allStudentsAlreadyGraded;
+
+  /// No description provided for @assessmentAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'Already graded'**
+  String get assessmentAlreadyExists;
+
+  /// No description provided for @selectClassSectionCourseFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Select class, section, and course first.'**
+  String get selectClassSectionCourseFirst;
 
   /// No description provided for @noGradeAssessments.
   ///

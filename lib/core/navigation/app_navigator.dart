@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_school_teacher/core/notifications/app_notification.dart';
+import 'package:my_school_teacher/controllers/activity_composer_controller.dart';
 import 'package:my_school_teacher/controllers/announcements_controller.dart';
 import 'package:my_school_teacher/controllers/media_controllers.dart';
 import 'package:my_school_teacher/controllers/agenda_composer_controller.dart';
@@ -24,6 +25,7 @@ import 'package:my_school_teacher/services/repositories/teacher_repository.dart'
 import 'package:my_school_teacher/views/announcements/announcement_details_page.dart';
 import 'package:my_school_teacher/views/announcements/announcements_page.dart';
 import 'package:my_school_teacher/views/activities/activities_page.dart';
+import 'package:my_school_teacher/views/activities/activity_editor_page.dart';
 import 'package:my_school_teacher/views/albums/albums_page.dart';
 import 'package:my_school_teacher/views/agenda/agenda_details_page.dart';
 import 'package:my_school_teacher/views/agenda/agenda_editor_page.dart';
@@ -182,6 +184,23 @@ abstract final class AppNavigator {
         child: const ActivitiesPage(),
       ),
     );
+  }
+
+  static Future<bool> activityEditor(BuildContext context) async {
+    final repository = _repository(context);
+    final saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => Provider<TeacherRepository>.value(
+          value: repository,
+          child: ChangeNotifierProvider(
+            create: (_) =>
+                ActivityComposerController(repository: repository)..load(),
+            child: const ActivityEditorPage(),
+          ),
+        ),
+      ),
+    );
+    return saved == true;
   }
 
   static Future<void> activityDetails(

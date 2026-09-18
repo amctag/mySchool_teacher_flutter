@@ -25,8 +25,8 @@ void main() {
     expect(find.text('Demo data'), findsNothing);
 
     await tester.enterText(
-      find.byKey(const Key('login_username')),
-      'sara.nasser',
+      find.byKey(const Key('login_id')),
+      '501',
     );
     await tester.enterText(
       find.byKey(const Key('login_password')),
@@ -55,8 +55,8 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(
-      find.byKey(const Key('login_username')),
-      'sara.nasser',
+      find.byKey(const Key('login_id')),
+      '501',
     );
     await tester.enterText(
       find.byKey(const Key('login_password')),

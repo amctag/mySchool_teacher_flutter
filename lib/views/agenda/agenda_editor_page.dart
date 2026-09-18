@@ -8,7 +8,6 @@ import 'package:my_school_teacher/models/request_models.dart';
 import 'package:my_school_teacher/models/teacher_agenda_item.dart';
 import 'package:my_school_teacher/controllers/agenda_composer_controller.dart';
 import 'package:my_school_teacher/views/widgets/brand_app_bar.dart';
-import 'package:my_school_teacher/views/widgets/section_card.dart';
 import 'package:my_school_teacher/views/widgets/state_views.dart';
 import 'package:my_school_teacher/views/widgets/app_select_field.dart';
 
@@ -123,147 +122,122 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
               children: [
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                     children: [
-                      _EditorHeader(
-                        icon: Icons.edit_note_rounded,
-                        title: _isEditing
-                            ? context.l10n.editAgenda
-                            : context.l10n.addAgenda,
-                        subtitle: context.l10n.parentsSeePublished,
-                      ),
-                      const SizedBox(height: 24),
-                      SectionCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              context.l10n.assignment,
-                              style: context.textStyles.titleSmall,
+                      AppSelectField<int>(
+                        key: const Key('agenda_assignment'),
+                        label: context.l10n.assignment,
+                        value: _selectedAssignmentId,
+                        enabled: !busy,
+                        options: [
+                          for (final assignment in assignments)
+                            AppSelectOption(
+                              value: assignment.id,
+                              label:
+                                  '${assignment.classLabel} · ${assignment.courseTitle}',
                             ),
-                            const SizedBox(height: 12),
-                            AppSelectField<int>(
-                              key: const Key('agenda_assignment'),
-                              label: context.l10n.assignment,
-                              value: _selectedAssignmentId,
-                              enabled: !busy,
-                              options: [
-                                for (final assignment in assignments)
-                                  AppSelectOption(
-                                    value: assignment.id,
-                                    label:
-                                        '${assignment.classLabel} · ${assignment.courseTitle}',
-                                  ),
-                              ],
-                              onChanged: (value) => setState(
-                                () => _selectedAssignmentId = value,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              minVerticalPadding: 12,
-                              leading: Container(
-                                width: 44,
-                                height: 44,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: context.colors.primaryContainer,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Icon(
-                                  Icons.calendar_today_outlined,
-                                  color: context.colors.primary,
-                                ),
-                              ),
-                              title: Text(context.l10n.agendaDate),
-                              subtitle: Text(
-                                DateFormat.yMMMEd().format(_selectedDate),
-                              ),
-                              trailing: const Icon(
-                                Icons.chevron_right_rounded,
-                              ),
-                              onTap: busy ? null : _pickDate,
-                            ),
-                          ],
+                        ],
+                        onChanged: (value) => setState(
+                          () => _selectedAssignmentId = value,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      SectionCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextFormField(
-                              controller: _titleController,
-                              textCapitalization: TextCapitalization.sentences,
-                              decoration: InputDecoration(
-                                labelText: context.l10n.titleLabel,
-                              ),
-                              validator: (value) =>
-                                  value == null || value.trim().isEmpty
-                                  ? context.l10n.fieldRequired
-                                  : null,
-                            ),
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _descriptionController,
-                              maxLines: 4,
-                              textCapitalization: TextCapitalization.sentences,
-                              decoration: InputDecoration(
-                                labelText: context.l10n.agendaDescription,
-                                alignLabelWithHint: true,
-                              ),
-                              validator: (value) =>
-                                  value == null || value.trim().isEmpty
-                                  ? context.l10n.fieldRequired
-                                  : null,
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              context.l10n.attachments,
-                              style: context.textStyles.titleSmall,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              context.l10n.optional,
-                              style: context.textStyles.bodySmall?.copyWith(
-                                color: context.colors.onSurfaceVariant,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            _AttachmentTile(
-                              key: const Key('agenda_pick_image'),
-                              icon: Icons.image_outlined,
-                              title: context.l10n.attachImage,
-                              subtitle: _uploadingImage
-                                  ? context.l10n.uploading
-                                  : (_imageName ?? context.l10n.chooseImage),
-                              selected: _imageUrl != null,
-                              uploading: _uploadingImage,
-                              onClear: () => setState(() {
-                                _imageName = null;
-                                _imageUrl = null;
-                              }),
-                              onPick: busy ? null : _pickImage,
-                            ),
-                            const SizedBox(height: 8),
-                            _AttachmentTile(
-                              key: const Key('agenda_pick_pdf'),
-                              icon: Icons.picture_as_pdf_outlined,
-                              title: context.l10n.attachPdf,
-                              subtitle: _uploadingPdf
-                                  ? context.l10n.uploading
-                                  : (_pdfName ?? context.l10n.choosePdf),
-                              selected: _pdfUrl != null,
-                              uploading: _uploadingPdf,
-                              onClear: () => setState(() {
-                                _pdfName = null;
-                                _pdfUrl = null;
-                              }),
-                              onPick: busy ? null : _pickPdf,
-                            ),
-                          ],
+                      const SizedBox(height: 8),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        minVerticalPadding: 8,
+                        leading: Container(
+                          width: 44,
+                          height: 44,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: context.colors.primaryContainer,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.calendar_today_outlined,
+                            color: context.colors.primary,
+                          ),
                         ),
+                        title: Text(context.l10n.agendaDate),
+                        subtitle: Text(
+                          DateFormat.yMMMEd().format(_selectedDate),
+                        ),
+                        trailing: const Icon(
+                          Icons.chevron_right_rounded,
+                        ),
+                        onTap: busy ? null : _pickDate,
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _titleController,
+                        textCapitalization: TextCapitalization.sentences,
+                        decoration: InputDecoration(
+                          labelText: context.l10n.titleLabel,
+                          isDense: true,
+                        ),
+                        validator: (value) =>
+                            value == null || value.trim().isEmpty
+                            ? context.l10n.fieldRequired
+                            : null,
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _descriptionController,
+                        maxLines: 4,
+                        textCapitalization: TextCapitalization.sentences,
+                        decoration: InputDecoration(
+                          labelText: context.l10n.agendaDescription,
+                          alignLabelWithHint: true,
+                          isDense: true,
+                        ),
+                        validator: (value) =>
+                            value == null || value.trim().isEmpty
+                            ? context.l10n.fieldRequired
+                            : null,
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        context.l10n.attachments,
+                        style: context.textStyles.titleSmall,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        context.l10n.optional,
+                        style: context.textStyles.bodySmall?.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _AttachmentTile(
+                        key: const Key('agenda_pick_image'),
+                        icon: Icons.image_outlined,
+                        title: context.l10n.attachImage,
+                        subtitle: _uploadingImage
+                            ? context.l10n.uploading
+                            : (_imageName ?? context.l10n.chooseImage),
+                        selected: _imageUrl != null,
+                        uploading: _uploadingImage,
+                        onClear: () => setState(() {
+                          _imageName = null;
+                          _imageUrl = null;
+                        }),
+                        onPick: busy ? null : _pickImage,
+                      ),
+                      const SizedBox(height: 8),
+                      _AttachmentTile(
+                        key: const Key('agenda_pick_pdf'),
+                        icon: Icons.picture_as_pdf_outlined,
+                        title: context.l10n.attachPdf,
+                        subtitle: _uploadingPdf
+                            ? context.l10n.uploading
+                            : (_pdfName ?? context.l10n.choosePdf),
+                        selected: _pdfUrl != null,
+                        uploading: _uploadingPdf,
+                        onClear: () => setState(() {
+                          _pdfName = null;
+                          _pdfUrl = null;
+                        }),
+                        onPick: busy ? null : _pickPdf,
                       ),
                     ],
                   ),
@@ -272,8 +246,9 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
                   color: context.colors.surface,
                   child: SafeArea(
                     top: false,
-                      child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                    minimum: EdgeInsets.zero,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                       child: widget.item?.published == true
                           ? SizedBox(
                               width: double.infinity,
@@ -292,36 +267,36 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
                               ),
                             )
                           : Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                minimumSize: const Size(64, 52),
-                              ),
-                              onPressed: busy
-                                  ? null
-                                  : () => _submit(published: false),
-                              child: Text(context.l10n.save),
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton(
+                                    style: OutlinedButton.styleFrom(
+                                      minimumSize: const Size(64, 52),
+                                    ),
+                                    onPressed: busy
+                                        ? null
+                                        : () => _submit(published: false),
+                                    child: Text(context.l10n.save),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: FilledButton(
+                                    onPressed: busy
+                                        ? null
+                                        : () => _submit(published: true),
+                                    child: submitting
+                                        ? const SizedBox.square(
+                                            dimension: 22,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : Text(context.l10n.publish),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: FilledButton(
-                              onPressed: busy
-                                  ? null
-                                  : () => _submit(published: true),
-                              child: submitting
-                                  ? const SizedBox.square(
-                                      dimension: 22,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Text(context.l10n.publish),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 ),
@@ -564,49 +539,5 @@ class _AttachmentTile extends StatelessWidget {
   }
 }
 
-class _EditorHeader extends StatelessWidget {
-  const _EditorHeader({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
 
-  final IconData icon;
-  final String title;
-  final String subtitle;
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 56,
-          height: 56,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: context.colors.primaryContainer,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Icon(icon, color: context.colors.primary, size: 28),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: context.textStyles.titleLarge),
-              const SizedBox(height: 6),
-              Text(
-                subtitle,
-                style: context.textStyles.bodyMedium?.copyWith(
-                  color: context.colors.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}

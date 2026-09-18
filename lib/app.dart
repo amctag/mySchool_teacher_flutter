@@ -10,6 +10,7 @@ import 'package:my_school_teacher/core/notifications/app_notification.dart';
 import 'package:my_school_teacher/core/notifications/noop_push_notification_service.dart';
 import 'package:my_school_teacher/core/notifications/push_notification_service.dart';
 import 'package:my_school_teacher/core/persistence/app_preferences.dart';
+import 'package:my_school_teacher/core/services/external_link_service.dart';
 import 'package:my_school_teacher/core/theme/app_theme.dart';
 import 'package:my_school_teacher/l10n/app_localizations.dart';
 import 'package:my_school_teacher/services/repositories/teacher_repository.dart';
@@ -23,11 +24,13 @@ class SchoolTeacherApp extends StatelessWidget {
     required this.repository,
     required this.preferences,
     this.pushNotificationService,
+    this.externalLinkService = const ExternalLinkService(),
   });
 
   final TeacherRepository repository;
   final AppPreferences preferences;
   final PushNotificationService? pushNotificationService;
+  final ExternalLinkService externalLinkService;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +40,7 @@ class SchoolTeacherApp extends StatelessWidget {
       providers: [
         Provider<TeacherRepository>.value(value: repository),
         Provider<PushNotificationService>.value(value: notifications),
+        Provider<ExternalLinkService>.value(value: externalLinkService),
         ChangeNotifierProvider(
           create: (_) =>
               AuthController(repository: repository, preferences: preferences)

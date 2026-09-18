@@ -30,7 +30,46 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signIn => 'تسجيل الدخول';
 
   @override
-  String get credentialsRequired => 'أدخل اسم المستخدم وكلمة المرور.';
+  String get support => 'الدعم';
+
+  @override
+  String get supportSubtitle => 'تواصل مع مدرستك للمساعدة في حسابك.';
+
+  @override
+  String get supportId => 'المعرّف';
+
+  @override
+  String get supportIdRequired => 'أدخل المعرّف للتواصل مع الدعم.';
+
+  @override
+  String get supportNoSchools =>
+      'لم يتم العثور على بيانات تواصل للمدرسة لهذا المعرّف.';
+
+  @override
+  String get supportLoadFailed => 'تعذر تحميل بيانات دعم المدرسة.';
+
+  @override
+  String get supportLookup => 'البحث عن بيانات المدرسة';
+
+  @override
+  String get credentialsRequired => 'أدخل المعرّف وكلمة المرور.';
+
+  @override
+  String get accountInactiveTitle => 'تعذّر تسجيل الدخول';
+
+  @override
+  String get accountInactiveBody =>
+      'هذا الحساب غير نشط. لا يمكنك تسجيل الدخول. تواصل مع الدعم للمساعدة.';
+
+  @override
+  String get accountUnpaidTitle => 'تعذّر تسجيل الدخول';
+
+  @override
+  String get accountUnpaidBody =>
+      'يلزم سداد الرسوم لهذا الحساب. لا يمكنك تسجيل الدخول. تواصل مع الدعم للمساعدة.';
+
+  @override
+  String get contactSupport => 'تواصل مع الدعم';
 
   @override
   String get home => 'الرئيسية';
@@ -283,6 +322,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get draft => 'مسودة';
 
   @override
+  String get you => 'أنت';
+
+  @override
   String get image => 'صورة';
 
   @override
@@ -471,6 +513,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addAgenda => 'إضافة مفكرة';
 
   @override
+  String get addActivity => 'إضافة نشاط';
+
+  @override
+  String get activityDate => 'تاريخ النشاط';
+
+  @override
+  String get activityContent => 'تفاصيل النشاط';
+
+  @override
   String get editAgenda => 'تعديل المفكرة';
 
   @override
@@ -504,6 +555,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get allStudentsAlreadyGraded =>
       'جميع الطلاب لديهم علامات لهذا التقييم.';
+
+  @override
+  String get assessmentAlreadyExists => 'تم وضع العلامات مسبقاً';
+
+  @override
+  String get selectClassSectionCourseFirst =>
+      'اختر الصف والشعبة والمادة أولاً.';
 
   @override
   String get noGradeAssessments => 'لا توجد تقييمات علامات مضافة بعد.';

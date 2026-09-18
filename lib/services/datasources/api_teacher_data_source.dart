@@ -12,21 +12,54 @@ class ApiTeacherDataSource implements TeacherDataSource {
 
   @override
   Future<Map<String, dynamic>> login(
-    String username,
+    int id,
     String password, {
     String? deviceToken,
   }) async {
+    try {
+      final data = await _api.post(
+        '/teacher/login',
+        body: {
+          'id': id,
+          'password': password,
+          if (deviceToken != null && deviceToken.isNotEmpty)
+            'fcmToken': deviceToken,
+        },
+      );
+      await _api.saveLoginTokens(data);
+      return _mapAccount(data);
+    } on TeacherApiException catch (error) {
+      throw _loginExceptionFor(error);
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchSupportSchools(int id) async {
     final data = await _api.post(
-      '/teacher/login',
-      body: {
-        'username': username.trim(),
-        'password': password,
-        if (deviceToken != null && deviceToken.isNotEmpty)
-          'fcmToken': deviceToken,
-      },
+      '/teacher/support/schools',
+      body: {'id': id},
     );
-    await _api.saveLoginTokens(data);
-    return _mapAccount(data);
+    final schools = data['schools'];
+    if (schools is! List) {
+      return const [];
+    }
+    return schools
+        .whereType<Map<String, dynamic>>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList(growable: false);
+  }
+
+  TeacherApiException _loginExceptionFor(TeacherApiException error) {
+    if (error.statusCode == 403) {
+      final paymentRequired = error.message.toLowerCase().contains('payment');
+      return TeacherApiException(
+        error.message,
+        statusCode: error.statusCode,
+        accountInactive: !paymentRequired,
+        paymentRequired: paymentRequired,
+      );
+    }
+    return error;
   }
 
   @override
@@ -269,6 +302,15 @@ class ApiTeacherDataSource implements TeacherDataSource {
   }
 
   @override
+  Future<void> createActivity(UpsertActivityRequest request) async {
+    await _api.post(
+      '/teacher/me/activities',
+      body: _activityBody(request),
+      auth: true,
+    );
+  }
+
+  @override
   Future<List<Map<String, dynamic>>> fetchTeacherAlbums() async {
     return _mapAnnouncementItems(
       await _api.get('/teacher/me/albums?page=1&limit=20'),
@@ -432,6 +474,7 @@ class ApiTeacherDataSource implements TeacherDataSource {
           json['attachmentUrl'] ??
           json['attachment_url'],
       'published': json['published'] ?? json['status'] == 1,
+      'is_own': json['isOwn'] ?? json['is_own'] ?? true,
     };
   }
 
@@ -445,6 +488,17 @@ class ApiTeacherDataSource implements TeacherDataSource {
       'published': request.published,
       'imageLink': request.imageLink ?? '',
       'fileLink': request.fileLink ?? '',
+    };
+  }
+
+  Map<String, dynamic> _activityBody(UpsertActivityRequest request) {
+    return {
+      'assignmentId': request.assignmentId,
+      'classId': request.classId,
+      'title': request.title,
+      'content': request.content,
+      'date': _dateOnly(request.date),
+      'image': request.image ?? '',
     };
   }
 

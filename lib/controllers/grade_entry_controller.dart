@@ -17,6 +17,7 @@ class GradeEntryState extends Equatable {
     this.selectedSectionId,
     this.selectedCourseId,
     this.selectedGradeTypeId,
+    this.usedGradeTypeIds = const {},
     this.message,
   });
 
@@ -27,6 +28,7 @@ class GradeEntryState extends Equatable {
   final int? selectedSectionId;
   final int? selectedCourseId;
   final int? selectedGradeTypeId;
+  final Set<int> usedGradeTypeIds;
   final String? message;
 
   List<GradeSectionOption> get sections {
@@ -80,6 +82,14 @@ class GradeEntryState extends Equatable {
   bool get selectedTypeIsMain =>
       selectedGradeType?.isMain ?? context?.isMain ?? false;
 
+  bool get canChooseAssessmentType =>
+      selectedClassId != null &&
+      selectedSectionId != null &&
+      selectedCourseId != null;
+
+  bool isGradeTypeUsed(int gradeTypeId) =>
+      usedGradeTypeIds.contains(gradeTypeId);
+
   bool get canLoadStudents =>
       selectedSectionId != null &&
       selectedCourseId != null &&
@@ -94,6 +104,7 @@ class GradeEntryState extends Equatable {
     selectedSectionId,
     selectedCourseId,
     selectedGradeTypeId,
+    usedGradeTypeIds,
     message,
   ];
 }
@@ -105,9 +116,12 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
 
   final TeacherRepository _repository;
   int _loadSeq = 0;
+  int _usedTypesSeq = 0;
+  bool _editingExisting = false;
 
   Future<void> initialize({GradeAssessmentSummary? assessment}) async {
     _loadSeq++;
+    _editingExisting = assessment != null;
     emit(const GradeEntryState(status: GradeEntryStatus.loading));
     try {
       final options = await _repository.gradeOptions();
@@ -115,12 +129,6 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
       var selectedSectionId = assessment?.sectionId;
       var selectedCourseId = assessment?.courseId;
       var selectedGradeTypeId = assessment?.gradeTypeId;
-      if (selectedGradeTypeId == null && options.gradeTypes.isNotEmpty) {
-        final mainTypes = options.gradeTypes.where((item) => item.isMain);
-        selectedGradeTypeId = mainTypes.isEmpty
-            ? options.gradeTypes.first.id
-            : mainTypes.first.id;
-      }
       if (assessment == null) {
         final unique = _uniquePath(
           options: options,
@@ -132,6 +140,21 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
         selectedSectionId = unique.sectionId;
         selectedCourseId = unique.courseId;
       }
+
+      var usedGradeTypeIds = <int>{};
+      if (selectedSectionId != null && selectedCourseId != null) {
+        usedGradeTypeIds = await _fetchUsedGradeTypeIds(
+          classId: selectedClassId,
+          sectionId: selectedSectionId,
+          courseId: selectedCourseId,
+        );
+      }
+
+      // Add grades: leave assessment type empty until the teacher picks one.
+      if (assessment == null) {
+        selectedGradeTypeId = null;
+      }
+
       GradeEntryContext? context;
       if (selectedSectionId != null &&
           selectedCourseId != null &&
@@ -150,6 +173,7 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
           selectedSectionId: selectedSectionId,
           selectedCourseId: selectedCourseId,
           selectedGradeTypeId: selectedGradeTypeId,
+          usedGradeTypeIds: usedGradeTypeIds,
           context: context,
         ),
       );
@@ -164,10 +188,7 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
   }
 
   Future<void> selectClass(int? classId) {
-    final unique = _uniquePath(
-      options: state.options,
-      classId: classId,
-    );
+    final unique = _uniquePath(options: state.options, classId: classId);
     emit(
       GradeEntryState(
         status: GradeEntryStatus.ready,
@@ -175,10 +196,11 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
         selectedClassId: unique.classId,
         selectedSectionId: unique.sectionId,
         selectedCourseId: unique.courseId,
-        selectedGradeTypeId: state.selectedGradeTypeId,
+        selectedGradeTypeId: null,
+        usedGradeTypeIds: const {},
       ),
     );
-    return _loadStudentsIfReady();
+    return _refreshUsedTypesAndStudents();
   }
 
   Future<void> selectSection(int? sectionId) {
@@ -194,10 +216,11 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
         selectedClassId: unique.classId,
         selectedSectionId: unique.sectionId,
         selectedCourseId: unique.courseId,
-        selectedGradeTypeId: state.selectedGradeTypeId,
+        selectedGradeTypeId: null,
+        usedGradeTypeIds: const {},
       ),
     );
-    return _loadStudentsIfReady();
+    return _refreshUsedTypesAndStudents();
   }
 
   Future<void> selectCourse(int? courseId) {
@@ -208,13 +231,19 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
         selectedClassId: state.selectedClassId,
         selectedSectionId: state.selectedSectionId,
         selectedCourseId: courseId,
-        selectedGradeTypeId: state.selectedGradeTypeId,
+        selectedGradeTypeId: null,
+        usedGradeTypeIds: const {},
       ),
     );
-    return _loadStudentsIfReady();
+    return _refreshUsedTypesAndStudents();
   }
 
   Future<void> selectGradeType(int? gradeTypeId) {
+    if (gradeTypeId != null &&
+        !_editingExisting &&
+        state.isGradeTypeUsed(gradeTypeId)) {
+      return Future.value();
+    }
     emit(
       GradeEntryState(
         status: GradeEntryStatus.ready,
@@ -223,6 +252,7 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
         selectedSectionId: state.selectedSectionId,
         selectedCourseId: state.selectedCourseId,
         selectedGradeTypeId: gradeTypeId,
+        usedGradeTypeIds: state.usedGradeTypeIds,
       ),
     );
     return _loadStudentsIfReady();
@@ -237,6 +267,7 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
         selectedSectionId: state.selectedSectionId,
         selectedCourseId: state.selectedCourseId,
         selectedGradeTypeId: state.selectedGradeTypeId,
+        usedGradeTypeIds: state.usedGradeTypeIds,
         context: state.context,
       ),
     );
@@ -250,6 +281,7 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
           selectedSectionId: state.selectedSectionId,
           selectedCourseId: state.selectedCourseId,
           selectedGradeTypeId: state.selectedGradeTypeId,
+          usedGradeTypeIds: state.usedGradeTypeIds,
           context: state.context,
         ),
       );
@@ -262,6 +294,7 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
           selectedSectionId: state.selectedSectionId,
           selectedCourseId: state.selectedCourseId,
           selectedGradeTypeId: state.selectedGradeTypeId,
+          usedGradeTypeIds: state.usedGradeTypeIds,
           context: state.context,
           message: error.toString(),
         ),
@@ -278,6 +311,7 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
         selectedSectionId: state.selectedSectionId,
         selectedCourseId: state.selectedCourseId,
         selectedGradeTypeId: state.selectedGradeTypeId,
+        usedGradeTypeIds: state.usedGradeTypeIds,
         context: state.context,
       ),
     );
@@ -291,6 +325,7 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
           selectedSectionId: state.selectedSectionId,
           selectedCourseId: state.selectedCourseId,
           selectedGradeTypeId: state.selectedGradeTypeId,
+          usedGradeTypeIds: state.usedGradeTypeIds,
         ),
       );
     } catch (error) {
@@ -302,11 +337,87 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
           selectedSectionId: state.selectedSectionId,
           selectedCourseId: state.selectedCourseId,
           selectedGradeTypeId: state.selectedGradeTypeId,
+          usedGradeTypeIds: state.usedGradeTypeIds,
           context: state.context,
           message: error.toString(),
         ),
       );
     }
+  }
+
+  Future<void> _refreshUsedTypesAndStudents() async {
+    final classId = state.selectedClassId;
+    final sectionId = state.selectedSectionId;
+    final courseId = state.selectedCourseId;
+    if (sectionId == null || courseId == null) {
+      return;
+    }
+
+    final seq = ++_usedTypesSeq;
+    try {
+      final used = await _fetchUsedGradeTypeIds(
+        classId: classId,
+        sectionId: sectionId,
+        courseId: courseId,
+      );
+      if (seq != _usedTypesSeq) {
+        return;
+      }
+
+      var gradeTypeId = state.selectedGradeTypeId;
+      if (!_editingExisting) {
+        if (gradeTypeId != null && used.contains(gradeTypeId)) {
+          gradeTypeId = null;
+        }
+        // Do not auto-pick an assessment type on Add grades.
+      }
+
+      emit(
+        GradeEntryState(
+          status: GradeEntryStatus.ready,
+          options: state.options,
+          selectedClassId: classId,
+          selectedSectionId: sectionId,
+          selectedCourseId: courseId,
+          selectedGradeTypeId: gradeTypeId,
+          usedGradeTypeIds: used,
+        ),
+      );
+      await _loadStudentsIfReady();
+    } catch (_) {
+      if (seq != _usedTypesSeq) {
+        return;
+      }
+      emit(
+        GradeEntryState(
+          status: GradeEntryStatus.ready,
+          options: state.options,
+          selectedClassId: classId,
+          selectedSectionId: sectionId,
+          selectedCourseId: courseId,
+          selectedGradeTypeId: state.selectedGradeTypeId,
+          usedGradeTypeIds: const {},
+        ),
+      );
+      await _loadStudentsIfReady();
+    }
+  }
+
+  Future<Set<int>> _fetchUsedGradeTypeIds({
+    int? classId,
+    required int sectionId,
+    required int courseId,
+  }) async {
+    final page = await _repository.gradeAssessments(
+      classId: classId,
+      sectionId: sectionId,
+      courseId: courseId,
+      page: 1,
+      limit: 100,
+    );
+    return {
+      for (final item in page.items) item.gradeTypeId,
+    };
   }
 
   Future<void> _loadStudentsIfReady() async {
@@ -332,6 +443,7 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
         selectedSectionId: sectionId,
         selectedCourseId: courseId,
         selectedGradeTypeId: gradeTypeId,
+        usedGradeTypeIds: state.usedGradeTypeIds,
       ),
     );
     try {
@@ -351,6 +463,7 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
           selectedSectionId: sectionId,
           selectedCourseId: courseId,
           selectedGradeTypeId: gradeTypeId,
+          usedGradeTypeIds: state.usedGradeTypeIds,
           context: context,
         ),
       );
@@ -366,6 +479,7 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
           selectedSectionId: sectionId,
           selectedCourseId: courseId,
           selectedGradeTypeId: gradeTypeId,
+          usedGradeTypeIds: state.usedGradeTypeIds,
           message: error.toString(),
         ),
       );

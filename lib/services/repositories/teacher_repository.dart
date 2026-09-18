@@ -6,6 +6,7 @@ import 'package:my_school_teacher/models/grade_entry_context.dart';
 import 'package:my_school_teacher/models/grade_options.dart';
 import 'package:my_school_teacher/models/paged_list.dart';
 import 'package:my_school_teacher/models/request_models.dart';
+import 'package:my_school_teacher/models/school_info.dart';
 import 'package:my_school_teacher/models/teacher_agenda_item.dart';
 import 'package:my_school_teacher/models/teacher_assignment.dart';
 import 'package:my_school_teacher/models/teacher_class_summary.dart';
@@ -21,12 +22,19 @@ class TeacherRepository {
   final TeacherDataSource _dataSource;
 
   Future<Account> login(
-    String username,
+    int id,
     String password, {
     String? deviceToken,
   }) async => Account.fromJson(
-    await _dataSource.login(username, password, deviceToken: deviceToken),
+    await _dataSource.login(id, password, deviceToken: deviceToken),
   );
+
+  Future<List<SchoolInfo>> fetchSupportSchools(int id) async {
+    final rows = await _dataSource.fetchSupportSchools(id);
+    return rows
+        .map(SchoolInfo.fromSchoolDetailsApiJson)
+        .toList(growable: false);
+  }
 
   Future<Account> currentAccount() async =>
       Account.fromJson(await _dataSource.fetchMe());
@@ -179,6 +187,9 @@ class TeacherRepository {
       (await _dataSource.fetchTeacherActivities())
           .map(TeacherActivity.fromJson)
           .toList(growable: false);
+
+  Future<void> createActivity(UpsertActivityRequest request) =>
+      _dataSource.createActivity(request);
 
   Future<List<TeacherAlbum>> albums() async =>
       (await _dataSource.fetchTeacherAlbums())

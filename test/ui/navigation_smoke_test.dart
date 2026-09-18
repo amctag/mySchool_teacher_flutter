@@ -55,8 +55,8 @@ Future<void> _pumpAuthenticatedApp(WidgetTester tester) async {
   );
   await tester.pumpAndSettle();
   await tester.enterText(
-    find.byKey(const Key('login_username')),
-    'sara.nasser',
+    find.byKey(const Key('login_id')),
+    '501',
   );
   await tester.enterText(
     find.byKey(const Key('login_password')),

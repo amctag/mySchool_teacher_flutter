@@ -31,7 +31,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signIn => 'Sign in';
 
   @override
-  String get credentialsRequired => 'Enter your username and password.';
+  String get support => 'Support';
+
+  @override
+  String get supportSubtitle =>
+      'Contact your school for help with your account.';
+
+  @override
+  String get supportId => 'ID';
+
+  @override
+  String get supportIdRequired => 'Enter your ID to contact support.';
+
+  @override
+  String get supportNoSchools =>
+      'No school contact details were found for this ID.';
+
+  @override
+  String get supportLoadFailed => 'Could not load school support details.';
+
+  @override
+  String get supportLookup => 'Find school contact';
+
+  @override
+  String get credentialsRequired => 'Enter your ID and password.';
+
+  @override
+  String get accountInactiveTitle => 'Cannot sign in';
+
+  @override
+  String get accountInactiveBody =>
+      'This account is inactive. You cannot log in. Contact support for help.';
+
+  @override
+  String get accountUnpaidTitle => 'Cannot sign in';
+
+  @override
+  String get accountUnpaidBody =>
+      'Payment is required for this account. You cannot log in. Contact support for help.';
+
+  @override
+  String get contactSupport => 'Contact support';
 
   @override
   String get home => 'Home';
@@ -290,6 +330,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get draft => 'Draft';
 
   @override
+  String get you => 'You';
+
+  @override
   String get image => 'Image';
 
   @override
@@ -478,6 +521,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addAgenda => 'Add agenda';
 
   @override
+  String get addActivity => 'Add activity';
+
+  @override
+  String get activityDate => 'Activity date';
+
+  @override
+  String get activityContent => 'Activity details';
+
+  @override
   String get editAgenda => 'Edit agenda';
 
   @override
@@ -510,6 +562,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get allStudentsAlreadyGraded =>
       'All students already have grades for this assessment.';
+
+  @override
+  String get assessmentAlreadyExists => 'Already graded';
+
+  @override
+  String get selectClassSectionCourseFirst =>
+      'Select class, section, and course first.';
 
   @override
   String get noGradeAssessments => 'No grade assessments created yet.';

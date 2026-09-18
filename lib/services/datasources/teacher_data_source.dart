@@ -16,10 +16,12 @@ abstract interface class TeacherDataSource {
   void clearReadCache();
 
   Future<Map<String, dynamic>> login(
-    String username,
+    int id,
     String password, {
     String? deviceToken,
   });
+
+  Future<List<Map<String, dynamic>>> fetchSupportSchools(int id);
 
   Future<Map<String, dynamic>> fetchMe();
 
@@ -95,6 +97,8 @@ abstract interface class TeacherDataSource {
   });
 
   Future<List<Map<String, dynamic>>> fetchTeacherActivities();
+
+  Future<void> createActivity(UpsertActivityRequest request);
 
   Future<List<Map<String, dynamic>>> fetchTeacherAlbums();
 }

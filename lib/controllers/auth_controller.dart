@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:my_school_teacher/controllers/notifier_controller.dart';
 import 'package:my_school_teacher/core/persistence/app_preferences.dart';
 import 'package:my_school_teacher/models/account.dart';
+import 'package:my_school_teacher/services/network/teacher_api_client.dart';
 import 'package:my_school_teacher/services/repositories/teacher_repository.dart';
 
 enum AuthStatus { initial, loading, unauthenticated, authenticated, failure }
@@ -11,14 +12,24 @@ class AuthState extends Equatable {
     this.status = AuthStatus.initial,
     this.account,
     this.message,
+    this.accountInactive = false,
+    this.paymentRequired = false,
   });
 
   final AuthStatus status;
   final Account? account;
   final String? message;
+  final bool accountInactive;
+  final bool paymentRequired;
 
   @override
-  List<Object?> get props => [status, account, message];
+  List<Object?> get props => [
+    status,
+    account,
+    message,
+    accountInactive,
+    paymentRequired,
+  ];
 }
 
 class AuthController extends NotifierController<AuthState> {
@@ -48,15 +59,15 @@ class AuthController extends NotifierController<AuthState> {
   }
 
   Future<void> login(
-    String username,
+    int id,
     String password, {
     String? deviceToken,
   }) async {
-    if (username.trim().isEmpty || password.isEmpty) {
+    if (id < 1 || password.isEmpty) {
       emit(
         const AuthState(
           status: AuthStatus.failure,
-          message: 'Username and password are required.',
+          message: 'Enter your ID and password.',
         ),
       );
       return;
@@ -65,12 +76,22 @@ class AuthController extends NotifierController<AuthState> {
     emit(const AuthState(status: AuthStatus.loading));
     try {
       final account = await _repository.login(
-        username,
+        id,
         password,
         deviceToken: deviceToken,
       );
       await _preferences.saveSession(true);
       emit(AuthState(status: AuthStatus.authenticated, account: account));
+    } on TeacherApiException catch (error) {
+      await _preferences.clearSession();
+      emit(
+        AuthState(
+          status: AuthStatus.failure,
+          message: error.message,
+          accountInactive: error.accountInactive,
+          paymentRequired: error.paymentRequired,
+        ),
+      );
     } catch (error) {
       await _preferences.clearSession();
       emit(AuthState(status: AuthStatus.failure, message: error.toString()));

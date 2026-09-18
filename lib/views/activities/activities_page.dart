@@ -10,6 +10,7 @@ import 'package:my_school_teacher/controllers/media_controllers.dart';
 import 'package:my_school_teacher/views/widgets/brand_app_bar.dart';
 import 'package:my_school_teacher/views/widgets/section_card.dart';
 import 'package:my_school_teacher/views/widgets/state_views.dart';
+import 'package:my_school_teacher/views/widgets/status_badge.dart';
 
 class ActivitiesPage extends StatelessWidget {
   const ActivitiesPage({super.key});
@@ -17,7 +18,14 @@ class ActivitiesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: BrandAppBar(title: context.l10n.activities),
+      appBar: BrandAppBar(
+        title: context.l10n.activities,
+        trailing: HeaderAction(
+          tooltip: context.l10n.addActivity,
+          icon: Icons.add_rounded,
+          onPressed: () => _openEditor(context),
+        ),
+      ),
       body: ControllerConsumer<
         ActivitiesController,
         LoadState<List<TeacherActivity>>
@@ -59,6 +67,13 @@ class ActivitiesPage extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _openEditor(BuildContext context) async {
+    final saved = await AppNavigator.activityEditor(context);
+    if (saved && context.mounted) {
+      await context.read<ActivitiesController>().refresh();
+    }
+  }
 }
 
 class _ActivityCard extends StatelessWidget {
@@ -76,6 +91,7 @@ class _ActivityCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Text(
@@ -83,6 +99,14 @@ class _ActivityCard extends StatelessWidget {
                     style: context.textStyles.titleMedium,
                   ),
                 ),
+                if (activity.isOwn) ...[
+                  const SizedBox(width: 8),
+                  StatusBadge(
+                    label: context.l10n.you,
+                    icon: Icons.person_rounded,
+                    color: context.colors.primary,
+                  ),
+                ],
                 Icon(
                   Icons.chevron_right_rounded,
                   color: context.colors.onSurfaceVariant,
@@ -137,7 +161,25 @@ class ActivityDetailsPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(activity.title, style: context.textStyles.titleLarge),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        activity.title,
+                        style: context.textStyles.titleLarge,
+                      ),
+                    ),
+                    if (activity.isOwn) ...[
+                      const SizedBox(width: 8),
+                      StatusBadge(
+                        label: context.l10n.you,
+                        icon: Icons.person_rounded,
+                        color: context.colors.primary,
+                      ),
+                    ],
+                  ],
+                ),
                 const SizedBox(height: 8),
                 Text(
                   activity.scopeLabel,

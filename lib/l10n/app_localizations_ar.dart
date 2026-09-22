@@ -378,6 +378,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noAnnouncements => 'لا توجد إشعارات حتى الآن.';
 
   @override
+  String get notifications => 'الإشعارات';
+
+  @override
+  String get noNotifications => 'لا توجد إشعارات حتى الآن.';
+
+  @override
   String get noActivities => 'لا توجد نشاطات حتى الآن.';
 
   @override
@@ -583,6 +589,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'يرى أولياء الأمور عناصر المفكرة المنشورة فقط.';
 
   @override
+  String get schoolPublishesAgenda =>
+      'المدرسة هي من تنشر المفكرة. يمكنك حفظ المسودات فقط.';
+
+  @override
   String get addGrades => 'إضافة علامات';
 
   @override
@@ -625,6 +635,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get addNotice => 'إضافة ملاحظة';
+
+  @override
+  String get addAnnouncement => 'إضافة إعلان';
+
+  @override
+  String get announcementAudience => 'الجمهور';
+
+  @override
+  String get audienceParent => 'أولياء الأمور';
+
+  @override
+  String get audienceTeacher => 'المعلمون';
 
   @override
   String get editNotice => 'تعديل الملاحظة';

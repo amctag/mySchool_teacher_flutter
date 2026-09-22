@@ -11,6 +11,7 @@ import 'package:my_school_teacher/views/widgets/brand_app_bar.dart';
 import 'package:my_school_teacher/views/widgets/section_card.dart';
 import 'package:my_school_teacher/views/widgets/state_views.dart';
 import 'package:my_school_teacher/views/widgets/app_select_field.dart';
+import 'package:my_school_teacher/views/widgets/status_badge.dart';
 
 class GradesPage extends StatefulWidget {
   const GradesPage({super.key});
@@ -304,7 +305,9 @@ class _GradeCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        DateFormat.yMMMd().format(assessment.publishDate),
+                        assessment.publishDate == null
+                            ? context.l10n.draft
+                            : DateFormat.yMMMd().format(assessment.publishDate!),
                         style: context.textStyles.bodySmall?.copyWith(
                           color: context.colors.onSurfaceVariant,
                         ),
@@ -313,24 +316,41 @@ class _GradeCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: context.colors.primaryContainer,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    assessment.maxGrade.toStringAsFixed(
-                      assessment.maxGrade % 1 == 0 ? 0 : 1,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    StatusBadge(
+                      label: assessment.published
+                          ? context.l10n.published
+                          : context.l10n.draft,
+                      icon: assessment.published
+                          ? Icons.public_outlined
+                          : Icons.lock_outline_rounded,
+                      color: assessment.published
+                          ? const Color(0xFF2E7D32)
+                          : const Color(0xFFF9A825),
                     ),
-                    style: context.textStyles.titleSmall?.copyWith(
-                      color: context.colors.primary,
-                      fontWeight: FontWeight.w800,
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: context.colors.primaryContainer,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        assessment.maxGrade.toStringAsFixed(
+                          assessment.maxGrade % 1 == 0 ? 0 : 1,
+                        ),
+                        style: context.textStyles.titleSmall?.copyWith(
+                          color: context.colors.primary,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),

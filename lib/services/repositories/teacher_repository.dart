@@ -14,6 +14,7 @@ import 'package:my_school_teacher/models/teacher_announcement.dart';
 import 'package:my_school_teacher/models/teacher_media.dart';
 import 'package:my_school_teacher/models/teacher_notice.dart';
 import 'package:my_school_teacher/models/teacher_attendance.dart';
+import 'package:my_school_teacher/models/teacher_push_notification.dart';
 import 'package:my_school_teacher/models/teacher_schedule.dart';
 
 class TeacherRepository {
@@ -43,6 +44,8 @@ class TeacherRepository {
   Future<void> logout() => _dataSource.logout();
 
   void clearReadCache() => _dataSource.clearReadCache();
+
+  bool get teachersCanPublishAgenda => _dataSource.teachersCanPublishAgenda;
 
   Future<void> changePassword(String currentPassword, String newPassword) {
     return _dataSource.changePassword(currentPassword, newPassword);
@@ -154,6 +157,9 @@ class TeacherRepository {
   Future<void> saveTeacherGrades(SaveTeacherGradesRequest request) =>
       _dataSource.saveTeacherGrades(request);
 
+  Future<void> publishTeacherGrades(int assessmentId) =>
+      _dataSource.publishTeacherGrades(assessmentId);
+
   Future<void> deleteGradeAssessment(int assessmentId) {
     return _dataSource.deleteGradeAssessment(assessmentId);
   }
@@ -211,6 +217,9 @@ class TeacherRepository {
   Future<void> createNotice(UpsertNoticeRequest request) =>
       _dataSource.createNotice(request);
 
+  Future<void> createAnnouncement(CreateAnnouncementRequest request) =>
+      _dataSource.createAnnouncement(request);
+
   Future<void> updateNotice(int noticeId, UpsertNoticeRequest request) =>
       _dataSource.updateNotice(noticeId, request);
 
@@ -241,4 +250,19 @@ class TeacherRepository {
       (await _dataSource.fetchTeacherAlbums())
           .map(TeacherAlbum.fromJson)
           .toList(growable: false);
+
+  Future<List<TeacherPushNotification>> notifications({
+    bool force = false,
+  }) async {
+    final rows = await _dataSource.fetchNotifications(forceRefresh: force);
+    final items = <TeacherPushNotification>[];
+    for (final row in rows) {
+      try {
+        items.add(TeacherPushNotification.fromApiJson(row));
+      } catch (_) {
+        // Skip malformed rows so one bad item cannot empty the inbox.
+      }
+    }
+    return items;
+  }
 }

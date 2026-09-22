@@ -394,6 +394,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noAnnouncements => 'Il n’y a pas encore d’avis.';
 
   @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get noNotifications => 'Aucune notification pour le moment.';
+
+  @override
   String get noActivities => 'Il n’y a pas encore d’activités.';
 
   @override
@@ -600,6 +606,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Les parents ne voient que les agendas publiés.';
 
   @override
+  String get schoolPublishesAgenda =>
+      'L’école publie les agendas. Vous pouvez seulement enregistrer des brouillons.';
+
+  @override
   String get addGrades => 'Ajouter des notes';
 
   @override
@@ -643,6 +653,18 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get addNotice => 'Ajouter une remarque';
+
+  @override
+  String get addAnnouncement => 'Ajouter une annonce';
+
+  @override
+  String get announcementAudience => 'Public';
+
+  @override
+  String get audienceParent => 'Parents';
+
+  @override
+  String get audienceTeacher => 'Enseignants';
 
   @override
   String get editNotice => 'Modifier la remarque';

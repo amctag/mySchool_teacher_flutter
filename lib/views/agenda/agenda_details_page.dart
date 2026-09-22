@@ -42,6 +42,8 @@ class _AgendaDetailsPageState extends State<AgendaDetailsPage> {
     final fileLink = _item.fileLink?.trim() ?? '';
     final hasImage = imageLink.isNotEmpty;
     final hasFile = fileLink.isNotEmpty;
+    final showPublish = !_item.published && _item.canPublish;
+    final showDelete = _item.isOwn;
     return Scaffold(
       appBar: BrandAppBar(
         title: context.l10n.agendaDetails,
@@ -155,7 +157,7 @@ class _AgendaDetailsPageState extends State<AgendaDetailsPage> {
           ],
         ],
       ),
-      bottomNavigationBar: !_item.isOwn
+      bottomNavigationBar: !showPublish && !showDelete
           ? null
           : Material(
         color: context.colors.surface,
@@ -165,7 +167,7 @@ class _AgendaDetailsPageState extends State<AgendaDetailsPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (!_item.published)
+                if (showPublish)
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
@@ -178,19 +180,20 @@ class _AgendaDetailsPageState extends State<AgendaDetailsPage> {
                           : Text(context.l10n.publish),
                     ),
                   ),
-                if (!_item.published) const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: _busy ? null : _confirmDelete,
-                    child: _deleting
-                        ? const SizedBox.square(
-                            dimension: 22,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(context.l10n.delete),
+                if (showPublish && showDelete) const SizedBox(height: 12),
+                if (showDelete)
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: _busy ? null : _confirmDelete,
+                      child: _deleting
+                          ? const SizedBox.square(
+                              dimension: 22,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(context.l10n.delete),
+                    ),
                   ),
-                ),
               ],
             ),
           ),

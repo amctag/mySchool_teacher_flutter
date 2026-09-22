@@ -10,6 +10,8 @@ class Account extends Equatable {
     this.title,
     this.department,
     this.phone,
+    this.isSupervisor = false,
+    this.supervisedClassIds = const [],
   });
 
   factory Account.fromJson(Map<String, dynamic> json) => Account(
@@ -21,6 +23,13 @@ class Account extends Equatable {
     title: json['title'] as String?,
     department: json['department'] as String?,
     phone: json['phone'] as String?,
+    isSupervisor:
+        json['is_supervisor'] == true || json['isSupervisor'] == true,
+    supervisedClassIds: ((json['supervised_class_ids'] ??
+                json['supervisedClassIds']) as List<dynamic>? ??
+            const [])
+        .map((item) => (item as num).toInt())
+        .toList(growable: false),
   );
 
   final int id;
@@ -31,6 +40,8 @@ class Account extends Equatable {
   final String? title;
   final String? department;
   final String? phone;
+  final bool isSupervisor;
+  final List<int> supervisedClassIds;
 
   String get initials => fullName
       .split(' ')
@@ -49,5 +60,7 @@ class Account extends Equatable {
     title,
     department,
     phone,
+    isSupervisor,
+    supervisedClassIds,
   ];
 }

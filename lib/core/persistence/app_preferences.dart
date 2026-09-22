@@ -13,8 +13,18 @@ class AppPreferences {
   static const _refreshTokenKey = 'refresh_token';
   static const _accessTokenExpiresKey = 'access_token_expires_at';
   static const _refreshTokenExpiresKey = 'refresh_token_expires_at';
+  static const _notificationsLastSeenPrefix = 'notifications_last_seen_id_';
 
   final SharedPreferences _preferences;
+
+  int lastSeenNotificationId(int personId) =>
+      _preferences.getInt('$_notificationsLastSeenPrefix$personId') ?? 0;
+
+  Future<void> saveLastSeenNotificationId(int personId, int notificationId) =>
+      _preferences.setInt(
+        '$_notificationsLastSeenPrefix$personId',
+        notificationId,
+      );
 
   bool get hasSession => _preferences.getBool(_sessionKey) ?? false;
 

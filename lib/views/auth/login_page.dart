@@ -4,6 +4,7 @@ import 'package:my_school_teacher/core/extensions/context_x.dart';
 import 'package:my_school_teacher/core/notifications/push_notification_service.dart';
 import 'package:my_school_teacher/controllers/auth_controller.dart';
 import 'package:my_school_teacher/views/auth/support_dialog.dart';
+import 'package:my_school_teacher/views/widgets/app_logo.dart';
 import 'package:my_school_teacher/views/widgets/language_toggle.dart';
 
 class LoginPage extends StatefulWidget {
@@ -71,42 +72,19 @@ class _LoginPageState extends State<LoginPage> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(24, 64, 24, 24),
                   children: [
-                    const SizedBox(height: 12),
-                    Center(
-                      child: Container(
-                        width: 112,
-                        height: 112,
-                        decoration: BoxDecoration(
-                          color: context.colors.primary,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: context.colors.primary.withValues(
-                                alpha: 0.22,
-                              ),
-                              offset: const Offset(0, 10),
-                              blurRadius: 24,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: FittedBox(
-                              child: Text(
-                                context.l10n.appName,
-                                textAlign: TextAlign.center,
-                                style: context.textStyles.titleSmall?.copyWith(
-                                  color: context.colors.onPrimary,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                    const Center(child: AppLogo()),
+                    const SizedBox(height: 14),
+                    Text(
+                      context.l10n.appName,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textStyles.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.2,
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 28),
                     Text(
                       context.l10n.welcomeBack,
                       textAlign: TextAlign.center,

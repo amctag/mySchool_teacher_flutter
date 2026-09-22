@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:my_school_teacher/controllers/auth_controller.dart';
 import 'package:my_school_teacher/controllers/locale_controller.dart';
+import 'package:my_school_teacher/controllers/notifications_controller.dart';
 import 'package:my_school_teacher/controllers/theme_controller.dart';
 import 'package:my_school_teacher/core/extensions/context_x.dart';
 import 'package:my_school_teacher/core/navigation/app_navigator.dart';
@@ -39,6 +40,7 @@ class SchoolTeacherApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider<TeacherRepository>.value(value: repository),
+        Provider<AppPreferences>.value(value: preferences),
         Provider<PushNotificationService>.value(value: notifications),
         Provider<ExternalLinkService>.value(value: externalLinkService),
         ChangeNotifierProvider(
@@ -114,7 +116,14 @@ class _SessionGate extends StatelessWidget {
           case AuthStatus.loading:
             return const _SplashPage();
           case AuthStatus.authenticated:
-            return HomePage(account: auth.state.account!);
+            return ChangeNotifierProvider(
+              create: (context) => NotificationsController(
+                repository: context.read<TeacherRepository>(),
+                preferences: context.read<AppPreferences>(),
+                personId: auth.state.account!.id,
+              )..load(force: true),
+              child: HomePage(account: auth.state.account!),
+            );
           case AuthStatus.unauthenticated:
           case AuthStatus.failure:
             return const LoginPage();

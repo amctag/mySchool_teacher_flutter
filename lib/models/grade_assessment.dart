@@ -1,5 +1,19 @@
 import 'package:equatable/equatable.dart';
 
+bool parseGradeJsonBool(dynamic value) {
+  if (value is bool) {
+    return value;
+  }
+  if (value is num) {
+    return value != 0;
+  }
+  if (value is String) {
+    final normalized = value.trim().toLowerCase();
+    return normalized == 'true' || normalized == '1';
+  }
+  return false;
+}
+
 class GradeAssessmentSummary extends Equatable {
   const GradeAssessmentSummary({
     required this.id,
@@ -14,7 +28,9 @@ class GradeAssessmentSummary extends Equatable {
     required this.gradeTypeTitle,
     required this.maxGrade,
     required this.coefficient,
-    required this.publishDate,
+    this.publishDate,
+    this.published = false,
+    this.canPublish = true,
     required this.entriesCount,
   });
 
@@ -22,6 +38,11 @@ class GradeAssessmentSummary extends Equatable {
     final className = (json['className'] ?? json['class_name'] ?? '') as String;
     final sectionTitle =
         (json['sectionTitle'] ?? json['section_title'] ?? '') as String;
+    final publishRaw = json['publishDate'] ?? json['publish_date'];
+    final published = parseGradeJsonBool(
+          json['published'],
+        ) ||
+        publishRaw != null;
     return GradeAssessmentSummary(
       id: json['id'] as int,
       classId: (json['classId'] ?? json['class_id'] ?? 0) as int,
@@ -41,11 +62,12 @@ class GradeAssessmentSummary extends Equatable {
           (json['gradeTypeTitle'] ?? json['grade_type_title'] ?? '') as String,
       maxGrade: ((json['maxGrade'] ?? json['max_grade'] ?? 0) as num).toDouble(),
       coefficient: ((json['coefficient'] ?? 1) as num).toDouble(),
-      publishDate: DateTime.parse(
-        (json['publishDate'] ??
-            json['publish_date'] ??
-            DateTime.now().toIso8601String()) as String,
-      ),
+      publishDate: publishRaw == null
+          ? null
+          : DateTime.tryParse(publishRaw as String),
+      published: published,
+      canPublish: json['can_publish'] != false &&
+          json['canPublish'] != false,
       entriesCount: (json['entriesCount'] ?? json['entries_count'] ?? 0) as int,
     );
   }
@@ -62,8 +84,31 @@ class GradeAssessmentSummary extends Equatable {
   final String gradeTypeTitle;
   final double maxGrade;
   final double coefficient;
-  final DateTime publishDate;
+  final DateTime? publishDate;
+  final bool published;
+  final bool canPublish;
   final int entriesCount;
+
+  GradeAssessmentSummary copyWith({bool? published, bool? canPublish}) {
+    return GradeAssessmentSummary(
+      id: id,
+      classId: classId,
+      className: className,
+      sectionId: sectionId,
+      sectionTitle: sectionTitle,
+      classLabel: classLabel,
+      courseId: courseId,
+      courseTitle: courseTitle,
+      gradeTypeId: gradeTypeId,
+      gradeTypeTitle: gradeTypeTitle,
+      maxGrade: maxGrade,
+      coefficient: coefficient,
+      publishDate: publishDate,
+      published: published ?? this.published,
+      canPublish: canPublish ?? this.canPublish,
+      entriesCount: entriesCount,
+    );
+  }
 
   @override
   List<Object?> get props => [
@@ -80,6 +125,8 @@ class GradeAssessmentSummary extends Equatable {
     maxGrade,
     coefficient,
     publishDate,
+    published,
+    canPublish,
     entriesCount,
   ];
 }

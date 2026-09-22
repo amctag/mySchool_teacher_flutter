@@ -115,15 +115,21 @@ class AttendanceClassOption extends Equatable {
 class TeacherAttendanceOptions extends Equatable {
   const TeacherAttendanceOptions({
     required this.attendancePerCourse,
+    this.canTakeAttendance = false,
     required this.classes,
     required this.reasons,
   });
 
   factory TeacherAttendanceOptions.fromJson(Map<String, dynamic> json) {
+    final attendancePerCourse = parseJsonBool(
+      json['attendancePerCourse'] ?? json['attendance_per_course'],
+    );
+    final canTake = json['canTakeAttendance'] ?? json['can_take_attendance'];
     return TeacherAttendanceOptions(
-      attendancePerCourse: parseJsonBool(
-        json['attendancePerCourse'] ?? json['attendance_per_course'],
-      ),
+      attendancePerCourse: attendancePerCourse,
+      canTakeAttendance: canTake == null
+          ? attendancePerCourse
+          : parseJsonBool(canTake),
       classes: ((json['classes'] as List<dynamic>?) ?? const [])
           .map(
             (item) => AttendanceClassOption.fromJson(
@@ -143,16 +149,23 @@ class TeacherAttendanceOptions extends Equatable {
 
   static const empty = TeacherAttendanceOptions(
     attendancePerCourse: false,
+    canTakeAttendance: false,
     classes: [],
     reasons: [],
   );
 
   final bool attendancePerCourse;
+  final bool canTakeAttendance;
   final List<AttendanceClassOption> classes;
   final List<AttendanceReasonOption> reasons;
 
   @override
-  List<Object?> get props => [attendancePerCourse, classes, reasons];
+  List<Object?> get props => [
+    attendancePerCourse,
+    canTakeAttendance,
+    classes,
+    reasons,
+  ];
 }
 
 class TeacherAttendanceListItem extends Equatable {

@@ -19,7 +19,7 @@ class AttendancesPage extends StatelessWidget {
     final canTakeAttendance = context
         .watch<AttendancesController>()
         .options
-        .attendancePerCourse;
+        .canTakeAttendance;
     return Scaffold(
       appBar: BrandAppBar(
         title: context.l10n.attendance,
@@ -80,7 +80,7 @@ class AttendancesPage extends StatelessWidget {
                           DateFormat.yMMMEd().format(controller.selectedDate),
                         ),
                       ),
-                      if (!controller.options.attendancePerCourse) ...[
+                      if (!controller.options.canTakeAttendance) ...[
                         const SizedBox(height: 12),
                         Text(
                           context.l10n.attendanceViewOnly,

@@ -53,7 +53,7 @@ class SaveTeacherGradesRequest extends Equatable {
     required this.courseId,
     required this.gradeTypeId,
     required this.maxGrade,
-    required this.publishDate,
+    this.publishDate,
     required this.entries,
   });
 
@@ -61,7 +61,7 @@ class SaveTeacherGradesRequest extends Equatable {
   final int courseId;
   final int gradeTypeId;
   final double maxGrade;
-  final DateTime publishDate;
+  final DateTime? publishDate;
   final List<StudentGradeInput> entries;
 
   Map<String, dynamic> toJson() => {
@@ -69,8 +69,9 @@ class SaveTeacherGradesRequest extends Equatable {
     'courseId': courseId,
     'gradeTypeId': gradeTypeId,
     'maxGrade': maxGrade,
-    'publishDate':
-        '${publishDate.year.toString().padLeft(4, '0')}-${publishDate.month.toString().padLeft(2, '0')}-${publishDate.day.toString().padLeft(2, '0')}',
+    if (publishDate != null)
+      'publishDate':
+          '${publishDate!.year.toString().padLeft(4, '0')}-${publishDate!.month.toString().padLeft(2, '0')}-${publishDate!.day.toString().padLeft(2, '0')}',
     'entries': entries.map((entry) => entry.toJson()).toList(growable: false),
   };
 
@@ -206,4 +207,28 @@ class UpsertNoticeRequest extends Equatable {
     publishDate,
     assignmentId,
   ];
+}
+
+class CreateAnnouncementRequest extends Equatable {
+  const CreateAnnouncementRequest({
+    required this.sectionId,
+    required this.audience,
+    required this.content,
+    this.title,
+  });
+
+  final int sectionId;
+  final String audience;
+  final String content;
+  final String? title;
+
+  Map<String, dynamic> toJson() => {
+    'sectionId': sectionId,
+    'audience': audience,
+    'content': content,
+    if (title != null && title!.trim().isNotEmpty) 'title': title!.trim(),
+  };
+
+  @override
+  List<Object?> get props => [sectionId, audience, content, title];
 }

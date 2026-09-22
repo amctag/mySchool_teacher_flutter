@@ -61,10 +61,13 @@ class GradeEntryContext extends Equatable {
     required this.coefficient,
     required this.maxGrade,
     this.publishDate,
+    this.published = false,
+    this.canPublish = true,
     required this.students,
   });
 
   factory GradeEntryContext.fromJson(Map<String, dynamic> json) {
+    final publishRaw = json['publishDate'] ?? json['publish_date'];
     return GradeEntryContext(
       gradeSheetId:
           (json['gradeSheetId'] ?? json['grade_sheet_id']) as int?,
@@ -83,7 +86,9 @@ class GradeEntryContext extends Equatable {
       isMain: parseJsonBool(json['isMain'] ?? json['is_main']),
       coefficient: ((json['coefficient'] ?? 1) as num).toDouble(),
       maxGrade: ((json['maxGrade'] ?? json['max_grade'] ?? 0) as num).toDouble(),
-      publishDate: (json['publishDate'] ?? json['publish_date']) as String?,
+      publishDate: publishRaw as String?,
+      published: parseJsonBool(json['published']) || publishRaw != null,
+      canPublish: json['can_publish'] != false && json['canPublish'] != false,
       students: ((json['students'] as List<dynamic>?) ?? const [])
           .map((item) => GradeEntryStudent.fromJson(item as Map<String, dynamic>))
           .toList(growable: false),
@@ -105,6 +110,8 @@ class GradeEntryContext extends Equatable {
   final double coefficient;
   final double maxGrade;
   final String? publishDate;
+  final bool published;
+  final bool canPublish;
   final List<GradeEntryStudent> students;
 
   List<StudentGradeInput> get seededEntries => [
@@ -134,6 +141,8 @@ class GradeEntryContext extends Equatable {
     coefficient,
     maxGrade,
     publishDate,
+    published,
+    canPublish,
     students,
   ];
 }

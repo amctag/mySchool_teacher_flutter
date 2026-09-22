@@ -357,7 +357,25 @@ class _GradeEntryPageState extends State<GradeEntryPage> {
                   ),
                 ),
               const SizedBox(height: 24),
-              if (_isExistingSheet && !_editing)
+              if (_isExistingSheet && !_editing) ...[
+                if (!(entryContext?.published ?? widget.assessment?.published ?? true) &&
+                    (entryContext?.canPublish ??
+                        widget.assessment?.canPublish ??
+                        false)) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: state.status == GradeEntryStatus.submitting ||
+                              entryContext?.gradeSheetId == null
+                          ? null
+                          : () => context
+                              .read<GradeEntryController>()
+                              .publish(entryContext!.gradeSheetId!),
+                      child: Text(context.l10n.publish),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
@@ -366,19 +384,15 @@ class _GradeEntryPageState extends State<GradeEntryPage> {
                         : () => setState(() => _editing = true),
                     child: Text(context.l10n.editGrades),
                   ),
-                )
-              else
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed:
-                        state.status == GradeEntryStatus.submitting ||
-                            entryContext == null ||
-                            students.isEmpty
-                        ? null
-                        : _submit,
-                    child: Text(context.l10n.save),
-                  ),
+                ),
+              ] else
+                _GradeSaveActions(
+                  busy: state.status == GradeEntryStatus.submitting,
+                  enabled: entryContext != null && students.isNotEmpty,
+                  canPublish: entryContext?.canPublish ?? true,
+                  alreadyPublished: entryContext?.published ?? false,
+                  onSave: ({required bool publish}) =>
+                      _submit(publish: publish),
                 ),
               if (_isExistingSheet && _editing) ...[
                 const SizedBox(height: 12),
@@ -446,7 +460,7 @@ class _GradeEntryPageState extends State<GradeEntryPage> {
     });
   }
 
-  void _submit() {
+  void _submit({required bool publish}) {
     final state = context.read<GradeEntryController>().state;
     final entryContext = state.context;
     final sectionId = state.selectedSectionId;
@@ -490,8 +504,10 @@ class _GradeEntryPageState extends State<GradeEntryPage> {
         courseId: courseId,
         gradeTypeId: gradeTypeId,
         maxGrade: maxGrade,
-        publishDate: DateTime.tryParse(entryContext.publishDate ?? '') ??
-            DateTime.now(),
+        publishDate: publish
+            ? (DateTime.tryParse(entryContext.publishDate ?? '') ??
+                DateTime.now())
+            : null,
         entries: entries,
       ),
     );
@@ -561,6 +577,57 @@ class _MetaLine extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _GradeSaveActions extends StatelessWidget {
+  const _GradeSaveActions({
+    required this.busy,
+    required this.enabled,
+    required this.canPublish,
+    required this.alreadyPublished,
+    required this.onSave,
+  });
+
+  final bool busy;
+  final bool enabled;
+  final bool canPublish;
+  final bool alreadyPublished;
+  final void Function({required bool publish}) onSave;
+
+  @override
+  Widget build(BuildContext context) {
+    if (alreadyPublished) {
+      return SizedBox(
+        width: double.infinity,
+        child: FilledButton(
+          onPressed: busy || !enabled ? null : () => onSave(publish: false),
+          child: Text(context.l10n.save),
+        ),
+      );
+    }
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(64, 52),
+            ),
+            onPressed: busy || !enabled ? null : () => onSave(publish: false),
+            child: Text(context.l10n.save),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: FilledButton(
+            onPressed: busy || !enabled || !canPublish
+                ? null
+                : () => onSave(publish: true),
+            child: Text(context.l10n.publish),
+          ),
+        ),
+      ],
     );
   }
 }

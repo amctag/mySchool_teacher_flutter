@@ -302,6 +302,50 @@ class GradeEntryController extends NotifierController<GradeEntryState> {
     }
   }
 
+  Future<void> publish(int assessmentId) async {
+    emit(
+      GradeEntryState(
+        status: GradeEntryStatus.submitting,
+        options: state.options,
+        selectedClassId: state.selectedClassId,
+        selectedSectionId: state.selectedSectionId,
+        selectedCourseId: state.selectedCourseId,
+        selectedGradeTypeId: state.selectedGradeTypeId,
+        usedGradeTypeIds: state.usedGradeTypeIds,
+        context: state.context,
+      ),
+    );
+    try {
+      await _repository.publishTeacherGrades(assessmentId);
+      emit(
+        GradeEntryState(
+          status: GradeEntryStatus.success,
+          options: state.options,
+          selectedClassId: state.selectedClassId,
+          selectedSectionId: state.selectedSectionId,
+          selectedCourseId: state.selectedCourseId,
+          selectedGradeTypeId: state.selectedGradeTypeId,
+          usedGradeTypeIds: state.usedGradeTypeIds,
+          context: state.context,
+        ),
+      );
+    } catch (error) {
+      emit(
+        GradeEntryState(
+          status: GradeEntryStatus.failure,
+          options: state.options,
+          selectedClassId: state.selectedClassId,
+          selectedSectionId: state.selectedSectionId,
+          selectedCourseId: state.selectedCourseId,
+          selectedGradeTypeId: state.selectedGradeTypeId,
+          usedGradeTypeIds: state.usedGradeTypeIds,
+          context: state.context,
+          message: error.toString(),
+        ),
+      );
+    }
+  }
+
   Future<void> delete(int assessmentId) async {
     emit(
       GradeEntryState(

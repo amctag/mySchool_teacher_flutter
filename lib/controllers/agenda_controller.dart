@@ -19,6 +19,7 @@ class AgendaController
   DateTime? _selectedDate;
   DateTime _visibleMonth;
   Set<DateTime> _activityDates = {};
+  bool teachersCanPublishAgenda = true;
 
   DateTime? get selectedDate => _selectedDate;
   DateTime get visibleMonth => _visibleMonth;
@@ -73,6 +74,7 @@ class AgendaController
           };
         }
       }
+      teachersCanPublishAgenda = _repository.teachersCanPublishAgenda;
       emit(LoadState.success(items));
     } catch (error) {
       emit(LoadState.failure(error.toString(), previous: state.data));

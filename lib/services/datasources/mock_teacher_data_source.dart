@@ -3,11 +3,18 @@ import 'dart:async';
 import 'package:my_school_teacher/services/datasources/teacher_data_source.dart';
 import 'package:my_school_teacher/models/request_models.dart';
 import 'package:my_school_teacher/models/teacher_notice.dart';
+import 'package:my_school_teacher/services/network/teacher_api_client.dart';
 
 class MockTeacherDataSource implements TeacherDataSource {
-  MockTeacherDataSource({this.delay = const Duration(milliseconds: 150)});
+  MockTeacherDataSource({
+    this.delay = const Duration(milliseconds: 150),
+    this.teachersCanPublishAgenda = true,
+  });
 
   final Duration delay;
+
+  @override
+  final bool teachersCanPublishAgenda;
 
   final Map<String, dynamic> _teacher = {
     'id': 501,
@@ -18,6 +25,8 @@ class MockTeacherDataSource implements TeacherDataSource {
     'title': 'Mathematics Teacher',
     'department': 'Primary Section',
     'phone': '+961 70 123 456',
+    'is_supervisor': true,
+    'supervised_class_ids': [201],
   };
 
   final List<Map<String, dynamic>> _assignments = [
@@ -435,6 +444,18 @@ class MockTeacherDataSource implements TeacherDataSource {
     },
   ];
 
+  final List<Map<String, dynamic>> _notifications = [
+    {
+      'id': 1,
+      'title': 'New notice',
+      'body': 'School meeting tomorrow at 10:00.',
+      'type': 'announcement',
+      'route': 'announcements',
+      'data': {'type': 'announcement', 'route': 'announcements'},
+      'createdAt': '2026-09-15T10:00:00.000Z',
+    },
+  ];
+
   String _password = 'school';
 
   @override
@@ -485,13 +506,16 @@ class MockTeacherDataSource implements TeacherDataSource {
       'time': '08:00',
       'image_link': request.imageLink,
       'file_link': request.fileLink,
-      'published': request.published,
+      'published': request.published && teachersCanPublishAgenda,
     });
   }
 
   @override
   Future<void> publishAgenda(int agendaId) async {
     await _pause();
+    if (!teachersCanPublishAgenda) {
+      throw const UnauthorizedTeacherActionException();
+    }
     final index = _agendaItems.indexWhere((item) => item['id'] == agendaId);
     if (index == -1) {
       return;
@@ -535,7 +559,11 @@ class MockTeacherDataSource implements TeacherDataSource {
       'grade_type_title': typeTitle,
       'max_grade': request.maxGrade,
       'coefficient': option.coefficient,
-      'publish_date': _dateOnly(request.publishDate),
+      'publish_date': request.publishDate == null
+          ? null
+          : _dateOnly(request.publishDate!),
+      'published': request.publishDate != null,
+      'can_publish': teachersCanPublishAgenda,
       'entries_count': request.entries.where((entry) => entry.score != null).length,
     };
     if (existingIndex == -1) {
@@ -574,9 +602,29 @@ class MockTeacherDataSource implements TeacherDataSource {
   }
 
   @override
+  Future<void> createAnnouncement(CreateAnnouncementRequest request) async {
+    await _pause();
+  }
+
+  @override
   Future<void> deleteAgenda(int agendaId) async {
     await _pause();
     _agendaItems.removeWhere((item) => item['id'] == agendaId);
+  }
+
+  @override
+  Future<void> publishTeacherGrades(int assessmentId) async {
+    await _pause();
+    final index =
+        _gradeAssessments.indexWhere((item) => item['id'] == assessmentId);
+    if (index == -1) {
+      throw const TeacherApiException('Grade sheet not found');
+    }
+    _gradeAssessments[index] = {
+      ..._gradeAssessments[index],
+      'publish_date': _dateOnly(DateTime.now()),
+      'published': true,
+    };
   }
 
   @override
@@ -680,6 +728,7 @@ class MockTeacherDataSource implements TeacherDataSource {
     await _pause();
     return {
       'attendancePerCourse': false,
+      'canTakeAttendance': true,
       'classes': [
         {
           'id': 2,
@@ -793,6 +842,7 @@ class MockTeacherDataSource implements TeacherDataSource {
       'courseId': courseId,
       'courseTitle': courseId == 11 ? 'Mathematics' : null,
       'attendancePerCourse': false,
+      'canTakeAttendance': true,
       'students': students,
     };
   }
@@ -971,7 +1021,9 @@ class MockTeacherDataSource implements TeacherDataSource {
       }
       return true;
     }).toList();
-    return _copyList(items);
+    return _copyList(items)
+        .map((item) => {...item, 'can_publish': teachersCanPublishAgenda})
+        .toList();
   }
 
   @override
@@ -1031,6 +1083,14 @@ class MockTeacherDataSource implements TeacherDataSource {
   Future<List<Map<String, dynamic>>> fetchTeacherAlbums() async {
     await _pause();
     return _copyList(_albums);
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchNotifications({
+    bool forceRefresh = false,
+  }) async {
+    await _pause();
+    return _copyList(_notifications);
   }
 
   @override

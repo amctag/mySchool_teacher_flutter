@@ -217,4 +217,12 @@ void main() {
     expect(albums.single.title, 'Opening day');
     expect(albums.single.images, hasLength(2));
   });
+
+  test('lists saved push notifications for the teacher', () async {
+    final items = await repository.notifications();
+
+    expect(items, hasLength(1));
+    expect(items.single.title, 'New notice');
+    expect(items.single.route, 'announcements');
+  });
 }

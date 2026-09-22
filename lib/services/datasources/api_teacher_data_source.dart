@@ -6,6 +6,10 @@ class ApiTeacherDataSource implements TeacherDataSource {
   ApiTeacherDataSource({required TeacherApiClient api}) : _api = api;
 
   final TeacherApiClient _api;
+  bool _teachersCanPublishAgenda = true;
+
+  @override
+  bool get teachersCanPublishAgenda => _teachersCanPublishAgenda;
 
   @override
   void clearReadCache() => _api.clearGetCache();
@@ -264,6 +268,11 @@ class ApiTeacherDataSource implements TeacherDataSource {
   }
 
   @override
+  Future<void> publishTeacherGrades(int assessmentId) async {
+    await _api.post('/teacher/me/grades/$assessmentId/publish', auth: true);
+  }
+
+  @override
   Future<void> deleteGradeAssessment(int assessmentId) async {
     await _api.delete('/teacher/me/grades/$assessmentId');
   }
@@ -357,10 +366,32 @@ class ApiTeacherDataSource implements TeacherDataSource {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> fetchNotifications({
+    bool forceRefresh = false,
+  }) async {
+    final json = await _api.get(
+      '/teacher/me/notifications',
+      forceRefresh: forceRefresh,
+    );
+    return ((json['notifications'] as List<dynamic>?) ?? [])
+        .map((item) => Map<String, dynamic>.from(item as Map))
+        .toList();
+  }
+
+  @override
   Future<void> createNotice(UpsertNoticeRequest request) async {
     await _api.post(
       '/teacher/me/notices',
       body: _noticeBody(request),
+      auth: true,
+    );
+  }
+
+  @override
+  Future<void> createAnnouncement(CreateAnnouncementRequest request) async {
+    await _api.post(
+      '/teacher/me/announcements',
+      body: request.toJson(),
       auth: true,
     );
   }
@@ -388,6 +419,9 @@ class ApiTeacherDataSource implements TeacherDataSource {
       'title': json['schoolName'] ?? json['title'],
       'department': json['department'],
       'phone': json['phoneNumber'] ?? json['phone'],
+      'is_supervisor': json['isSupervisor'] ?? json['is_supervisor'] ?? false,
+      'supervised_class_ids':
+          json['supervisedClassIds'] ?? json['supervised_class_ids'] ?? const [],
     };
   }
 
@@ -490,6 +524,11 @@ class ApiTeacherDataSource implements TeacherDataSource {
   }
 
   List<Map<String, dynamic>> _mapAgendaItems(Map<String, dynamic> json) {
+    final schoolCanPublish =
+        json['teachersCanPublishAgenda'] ?? json['teachers_can_publish_agenda'];
+    if (schoolCanPublish is bool) {
+      _teachersCanPublishAgenda = schoolCanPublish;
+    }
     return ((json['items'] as List<dynamic>?) ?? [])
         .map((item) => _mapAgenda(item as Map<String, dynamic>))
         .toList();
@@ -515,6 +554,7 @@ class ApiTeacherDataSource implements TeacherDataSource {
           json['attachment_url'],
       'published': json['published'] ?? json['status'] == 1,
       'is_own': json['isOwn'] ?? json['is_own'] ?? true,
+      'can_publish': json['canPublish'] ?? json['can_publish'] ?? true,
     };
   }
 

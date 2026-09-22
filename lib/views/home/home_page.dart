@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:my_school_teacher/controllers/notifications_controller.dart';
 import 'package:my_school_teacher/core/extensions/context_x.dart';
 import 'package:my_school_teacher/core/navigation/app_navigator.dart';
 import 'package:my_school_teacher/models/account.dart';
+import 'package:my_school_teacher/views/widgets/brand_app_bar.dart';
 import 'package:my_school_teacher/views/widgets/feature_tile.dart';
 
 class HomePage extends StatelessWidget {
@@ -83,6 +86,20 @@ class HomePage extends StatelessWidget {
           ),
         ),
         title: Text(context.l10n.appName),
+        actions: [
+          Consumer<NotificationsController>(
+            builder: (context, notifications, _) {
+              return HeaderAction(
+                buttonKey: const Key('home_notifications'),
+                tooltip: context.l10n.notifications,
+                icon: Icons.notifications_none_rounded,
+                badgeCount: notifications.unreadCount,
+                onPressed: () => AppNavigator.notifications(context),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SafeArea(
         top: false,

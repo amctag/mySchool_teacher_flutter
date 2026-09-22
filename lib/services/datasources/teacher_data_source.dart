@@ -15,6 +15,8 @@ class UnauthorizedTeacherActionException implements Exception {
 abstract interface class TeacherDataSource {
   void clearReadCache();
 
+  bool get teachersCanPublishAgenda;
+
   Future<Map<String, dynamic>> login(
     int id,
     String password, {
@@ -79,6 +81,8 @@ abstract interface class TeacherDataSource {
 
   Future<void> saveTeacherGrades(SaveTeacherGradesRequest request);
 
+  Future<void> publishTeacherGrades(int assessmentId);
+
   Future<void> deleteGradeAssessment(int assessmentId);
 
   Future<Map<String, dynamic>> fetchAttendanceOptions({DateTime? date});
@@ -101,6 +105,8 @@ abstract interface class TeacherDataSource {
 
   Future<void> createNotice(UpsertNoticeRequest request);
 
+  Future<void> createAnnouncement(CreateAnnouncementRequest request);
+
   Future<void> updateNotice(int noticeId, UpsertNoticeRequest request);
 
   Future<void> deleteNotice(int noticeId);
@@ -117,4 +123,8 @@ abstract interface class TeacherDataSource {
   Future<void> createActivity(UpsertActivityRequest request);
 
   Future<List<Map<String, dynamic>>> fetchTeacherAlbums();
+
+  Future<List<Map<String, dynamic>>> fetchNotifications({
+    bool forceRefresh = false,
+  });
 }

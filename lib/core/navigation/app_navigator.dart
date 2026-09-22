@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:my_school_teacher/core/notifications/app_notification.dart';
+import 'package:my_school_teacher/core/persistence/app_preferences.dart';
 import 'package:my_school_teacher/controllers/activity_composer_controller.dart';
+import 'package:my_school_teacher/controllers/announcement_composer_controller.dart';
 import 'package:my_school_teacher/controllers/announcements_controller.dart';
+import 'package:my_school_teacher/controllers/auth_controller.dart';
 import 'package:my_school_teacher/controllers/media_controllers.dart';
 import 'package:my_school_teacher/controllers/agenda_composer_controller.dart';
 import 'package:my_school_teacher/controllers/agenda_controller.dart';
@@ -15,6 +18,7 @@ import 'package:my_school_teacher/controllers/grades_controller.dart';
 import 'package:my_school_teacher/controllers/my_classes_controller.dart';
 import 'package:my_school_teacher/controllers/notice_composer_controller.dart';
 import 'package:my_school_teacher/controllers/notices_controller.dart';
+import 'package:my_school_teacher/controllers/notifications_controller.dart';
 import 'package:my_school_teacher/controllers/schedule_controller.dart';
 import 'package:my_school_teacher/models/account.dart';
 import 'package:my_school_teacher/models/grade_assessment.dart';
@@ -26,6 +30,7 @@ import 'package:my_school_teacher/models/teacher_class_summary.dart';
 import 'package:my_school_teacher/models/teacher_notice.dart';
 import 'package:my_school_teacher/services/repositories/teacher_repository.dart';
 import 'package:my_school_teacher/views/announcements/announcement_details_page.dart';
+import 'package:my_school_teacher/views/announcements/announcement_editor_page.dart';
 import 'package:my_school_teacher/views/announcements/announcements_page.dart';
 import 'package:my_school_teacher/views/activities/activities_page.dart';
 import 'package:my_school_teacher/views/activities/activity_editor_page.dart';
@@ -42,6 +47,7 @@ import 'package:my_school_teacher/views/grades/grade_entry_page.dart';
 import 'package:my_school_teacher/views/grades/grades_page.dart';
 import 'package:my_school_teacher/views/notices/notice_editor_page.dart';
 import 'package:my_school_teacher/views/notices/notices_page.dart';
+import 'package:my_school_teacher/views/notifications/notifications_page.dart';
 import 'package:my_school_teacher/views/profile/change_password_page.dart';
 import 'package:my_school_teacher/views/profile/profile_page.dart';
 import 'package:my_school_teacher/views/profile/teacher_profile_page.dart';
@@ -107,6 +113,7 @@ abstract final class AppNavigator {
   static Future<bool> agendaEditor(
     BuildContext context, {
     TeacherAgendaItem? item,
+    bool canPublish = true,
   }) async {
     final repository = _repository(context);
     final saved = await Navigator.of(context).push<bool>(
@@ -116,7 +123,10 @@ abstract final class AppNavigator {
           child: ChangeNotifierProvider(
             create: (_) =>
                 AgendaComposerController(repository: repository)..load(),
-            child: AgendaEditorPage(item: item),
+            child: AgendaEditorPage(
+              item: item,
+              canPublish: item?.canPublish ?? canPublish,
+            ),
           ),
         ),
       ),
@@ -198,6 +208,23 @@ abstract final class AppNavigator {
         child: const AnnouncementsPage(),
       ),
     );
+  }
+
+  static Future<bool> announcementEditor(BuildContext context) async {
+    final repository = _repository(context);
+    final saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => Provider<TeacherRepository>.value(
+          value: repository,
+          child: ChangeNotifierProvider(
+            create: (_) =>
+                AnnouncementComposerController(repository: repository)..load(),
+            child: const AnnouncementEditorPage(),
+          ),
+        ),
+      ),
+    );
+    return saved == true;
   }
 
   static Future<void> announcementDetails(
@@ -312,6 +339,39 @@ abstract final class AppNavigator {
 
   static Future<void> settings(BuildContext context) =>
       _push(context, const SettingsPage());
+
+  static Future<void> notifications(BuildContext context) {
+    NotificationsController? existing;
+    try {
+      existing = context.read<NotificationsController>();
+    } on ProviderNotFoundException {
+      existing = null;
+    }
+    if (existing != null) {
+      existing.load(force: true, markAsSeen: true);
+      return _push(
+        context,
+        ChangeNotifierProvider<NotificationsController>.value(
+          value: existing,
+          child: const NotificationsPage(),
+        ),
+      );
+    }
+    final repository = _repository(context);
+    final preferences = context.read<AppPreferences>();
+    final personId = context.read<AuthController>().state.account?.id ?? 0;
+    return _push(
+      context,
+      ChangeNotifierProvider(
+        create: (_) => NotificationsController(
+          repository: repository,
+          preferences: preferences,
+          personId: personId,
+        )..load(force: true, markAsSeen: true),
+        child: const NotificationsPage(),
+      ),
+    );
+  }
 
   static Future<void> language(BuildContext context) =>
       _push(context, const LanguagePage());

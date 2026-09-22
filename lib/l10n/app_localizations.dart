@@ -808,6 +808,18 @@ abstract class AppLocalizations {
   /// **'There are no notices yet.'**
   String get noAnnouncements;
 
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @noNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet.'**
+  String get noNotifications;
+
   /// No description provided for @noActivities.
   ///
   /// In en, this message translates to:
@@ -1192,6 +1204,12 @@ abstract class AppLocalizations {
   /// **'Parents only see published agenda items.'**
   String get parentsSeePublished;
 
+  /// No description provided for @schoolPublishesAgenda.
+  ///
+  /// In en, this message translates to:
+  /// **'The school publishes agenda items. You can save drafts only.'**
+  String get schoolPublishesAgenda;
+
   /// No description provided for @addGrades.
   ///
   /// In en, this message translates to:
@@ -1275,6 +1293,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add remarque'**
   String get addNotice;
+
+  /// No description provided for @addAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'Add announcement'**
+  String get addAnnouncement;
+
+  /// No description provided for @announcementAudience.
+  ///
+  /// In en, this message translates to:
+  /// **'Audience'**
+  String get announcementAudience;
+
+  /// No description provided for @audienceParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parents'**
+  String get audienceParent;
+
+  /// No description provided for @audienceTeacher.
+  ///
+  /// In en, this message translates to:
+  /// **'Teachers'**
+  String get audienceTeacher;
 
   /// No description provided for @editNotice.
   ///

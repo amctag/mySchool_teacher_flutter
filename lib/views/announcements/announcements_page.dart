@@ -3,9 +3,11 @@ import 'package:intl/intl.dart';
 import 'package:my_school_teacher/core/widgets/controller_consumer.dart';
 import 'package:provider/provider.dart';
 import 'package:my_school_teacher/core/extensions/context_x.dart';
+import 'package:my_school_teacher/core/navigation/app_navigator.dart';
 import 'package:my_school_teacher/core/state/load_state.dart';
 import 'package:my_school_teacher/models/teacher_announcement.dart';
 import 'package:my_school_teacher/controllers/announcements_controller.dart';
+import 'package:my_school_teacher/controllers/auth_controller.dart';
 import 'package:my_school_teacher/views/widgets/app_select_field.dart';
 import 'package:my_school_teacher/views/widgets/brand_app_bar.dart';
 import 'package:my_school_teacher/views/widgets/section_card.dart';
@@ -31,6 +33,8 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isSupervisor =
+        context.watch<AuthController>().state.account?.isSupervisor ?? false;
     final filterDrawer = _AnnouncementsFilterDrawer(
       onApply: () async {
         await context.read<AnnouncementsController>().applyFilters();
@@ -42,7 +46,21 @@ class _AnnouncementsPageState extends State<AnnouncementsPage> {
     return Scaffold(
       key: _scaffoldKey,
       endDrawer: filterDrawer,
-      appBar: BrandAppBar(title: context.l10n.announcements),
+      appBar: BrandAppBar(
+        title: context.l10n.announcements,
+        trailing: isSupervisor
+            ? HeaderAction(
+                tooltip: context.l10n.addAnnouncement,
+                icon: Icons.add_rounded,
+                onPressed: () async {
+                  final saved = await AppNavigator.announcementEditor(context);
+                  if (saved && context.mounted) {
+                    await context.read<AnnouncementsController>().refresh();
+                  }
+                },
+              )
+            : null,
+      ),
       body: ControllerConsumer<
         AnnouncementsController,
         LoadState<List<TeacherAnnouncement>>

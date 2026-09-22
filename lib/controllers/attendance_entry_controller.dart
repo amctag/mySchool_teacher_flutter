@@ -69,7 +69,7 @@ class AttendanceEntryState extends Equatable {
     return selectedCourseId != null;
   }
 
-  bool get canTakeAttendance => options.attendancePerCourse;
+  bool get canTakeAttendance => options.canTakeAttendance;
 
   @override
   List<Object?> get props => [

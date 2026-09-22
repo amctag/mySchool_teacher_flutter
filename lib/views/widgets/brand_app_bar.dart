@@ -54,30 +54,40 @@ class HeaderAction extends StatelessWidget {
     required this.tooltip,
     required this.icon,
     required this.onPressed,
+    this.buttonKey = const Key('brand_app_bar_action'),
+    this.badgeCount,
   });
 
   final String tooltip;
   final IconData icon;
   final VoidCallback onPressed;
+  final Key buttonKey;
+  final int? badgeCount;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      key: const Key('brand_app_bar_action'),
+      key: buttonKey,
       tooltip: tooltip,
       onPressed: onPressed,
       style: IconButton.styleFrom(
         minimumSize: const Size.square(48),
       ),
-      icon: Container(
-        width: 32,
-        height: 32,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 1.6),
+      icon: Badge(
+        isLabelVisible: (badgeCount ?? 0) > 0,
+        label: Text(
+          (badgeCount ?? 0) > 99 ? '99+' : '${badgeCount ?? 0}',
         ),
-        child: Icon(icon, size: 18, color: Colors.white),
+        child: Container(
+          width: 32,
+          height: 32,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 1.6),
+          ),
+          child: Icon(icon, size: 18, color: Colors.white),
+        ),
       ),
     );
   }

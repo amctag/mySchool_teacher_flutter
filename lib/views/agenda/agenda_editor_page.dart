@@ -12,9 +12,14 @@ import 'package:my_school_teacher/views/widgets/state_views.dart';
 import 'package:my_school_teacher/views/widgets/app_select_field.dart';
 
 class AgendaEditorPage extends StatefulWidget {
-  const AgendaEditorPage({super.key, this.item});
+  const AgendaEditorPage({
+    super.key,
+    this.item,
+    this.canPublish = true,
+  });
 
   final TeacherAgendaItem? item;
+  final bool canPublish;
 
   @override
   State<AgendaEditorPage> createState() => _AgendaEditorPageState();
@@ -124,6 +129,15 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                     children: [
+                      if (!_canPublish) ...[
+                        Text(
+                          context.l10n.schoolPublishesAgenda,
+                          style: context.textStyles.bodyMedium?.copyWith(
+                            color: context.colors.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
                       AppSelectField<int>(
                         key: const Key('agenda_assignment'),
                         label: context.l10n.assignment,
@@ -249,54 +263,11 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
                     minimum: EdgeInsets.zero,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                      child: widget.item?.published == true
-                          ? SizedBox(
-                              width: double.infinity,
-                              child: FilledButton(
-                                onPressed: busy
-                                    ? null
-                                    : () => _submit(published: true),
-                                child: submitting
-                                    ? const SizedBox.square(
-                                        dimension: 22,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : Text(context.l10n.save),
-                              ),
-                            )
-                          : Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton(
-                                    style: OutlinedButton.styleFrom(
-                                      minimumSize: const Size(64, 52),
-                                    ),
-                                    onPressed: busy
-                                        ? null
-                                        : () => _submit(published: false),
-                                    child: Text(context.l10n.save),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: FilledButton(
-                                    onPressed: busy
-                                        ? null
-                                        : () => _submit(published: true),
-                                    child: submitting
-                                        ? const SizedBox.square(
-                                            dimension: 22,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                            ),
-                                          )
-                                        : Text(context.l10n.publish),
-                                  ),
-                                ),
-                              ],
-                            ),
+                      child: _editorActions(
+                        context,
+                        busy: busy,
+                        submitting: submitting,
+                      ),
                     ),
                   ),
                 ),
@@ -411,6 +382,55 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
   bool _hasExtension(String name, List<String> extensions) {
     final lower = name.toLowerCase();
     return extensions.any((ext) => lower.endsWith('.$ext'));
+  }
+
+  bool get _canPublish => widget.item?.canPublish ?? widget.canPublish;
+
+  Widget _editorActions(
+    BuildContext context, {
+    required bool busy,
+    required bool submitting,
+  }) {
+    final keepPublished = widget.item?.published == true;
+    if (keepPublished || !_canPublish) {
+      return SizedBox(
+        width: double.infinity,
+        child: FilledButton(
+          onPressed: busy ? null : () => _submit(published: keepPublished),
+          child: submitting
+              ? const SizedBox.square(
+                  dimension: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(context.l10n.save),
+        ),
+      );
+    }
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(64, 52),
+            ),
+            onPressed: busy ? null : () => _submit(published: false),
+            child: Text(context.l10n.save),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: FilledButton(
+            onPressed: busy ? null : () => _submit(published: true),
+            child: submitting
+                ? const SizedBox.square(
+                    dimension: 22,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(context.l10n.publish),
+          ),
+        ),
+      ],
+    );
   }
 
   void _submit({required bool published}) {

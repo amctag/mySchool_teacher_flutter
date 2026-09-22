@@ -6,6 +6,7 @@ import 'package:my_school_teacher/core/navigation/app_navigator.dart';
 import 'package:my_school_teacher/core/state/load_state.dart';
 import 'package:my_school_teacher/models/teacher_agenda_item.dart';
 import 'package:my_school_teacher/controllers/agenda_controller.dart';
+import 'package:my_school_teacher/controllers/auth_controller.dart';
 import 'package:my_school_teacher/views/agenda/agenda_month_calendar.dart';
 import 'package:my_school_teacher/views/widgets/brand_app_bar.dart';
 import 'package:my_school_teacher/views/widgets/section_card.dart';
@@ -141,7 +142,14 @@ class AgendaPage extends StatelessWidget {
   }
 
   Future<void> _openEditor(BuildContext context) async {
-    await AppNavigator.agendaEditor(context);
+    final schoolCanPublish =
+        context.read<AgendaController>().teachersCanPublishAgenda;
+    final isSupervisor =
+        context.read<AuthController>().state.account?.isSupervisor ?? false;
+    await AppNavigator.agendaEditor(
+      context,
+      canPublish: schoolCanPublish || isSupervisor,
+    );
     if (context.mounted) {
       await context.read<AgendaController>().load();
     }

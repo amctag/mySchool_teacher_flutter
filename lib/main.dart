@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_school_teacher/app.dart';
 import 'package:my_school_teacher/core/notifications/fcm_push_notification_service.dart';
+import 'package:my_school_teacher/core/notifications/firebase_web_config.dart';
 import 'package:my_school_teacher/core/notifications/noop_push_notification_service.dart';
 import 'package:my_school_teacher/core/notifications/push_notification_service.dart';
 import 'package:my_school_teacher/core/persistence/app_preferences.dart';
@@ -32,10 +33,12 @@ Future<void> main() async {
       api: TeacherApiClient(preferences: preferences),
     ),
   );
-  // Web has no google-services / FirebaseOptions; FCM stays mobile-only.
-  final PushNotificationService pushNotificationService = kIsWeb
-      ? NoopPushNotificationService()
-      : FcmPushNotificationService();
+  // Phone always uses FCM. Web uses FCM only after the Firebase web app id
+  // and VAPID key are baked in; otherwise the site still loads.
+  final PushNotificationService pushNotificationService =
+      !kIsWeb || TeacherFirebaseWeb.isConfigured
+      ? FcmPushNotificationService()
+      : NoopPushNotificationService();
   try {
     await pushNotificationService.init();
   } on Object {

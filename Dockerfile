@@ -12,6 +12,11 @@ WORKDIR /app
 # Override it with a Docker build argument (Easypanel -> Build args).
 # This is a public URL, never a secret - do not put tokens here.
 ARG API_BASE_URL=https://amctag-my-school.38f0fz.easypanel.host
+# Web app from Firebase Console. VAPID is the Web Push public key
+# (Project settings → Cloud Messaging → Web Push certificates).
+ARG FIREBASE_WEB_APP_ID=1:756524911884:web:f145cca98f3f37c8398d29
+ARG FIREBASE_API_KEY=AIzaSyCT1WLuTArbf8dGVMrEfhWFrMsj2B3JqMg
+ARG FIREBASE_VAPID_KEY=
 
 # Dependency layer: only re-runs when the pubspec files change.
 COPY pubspec.yaml pubspec.lock ./
@@ -25,7 +30,11 @@ COPY . .
 RUN flutter build web --release \
     --no-web-resources-cdn \
     --no-wasm-dry-run \
-    --dart-define=API_BASE_URL=${API_BASE_URL}
+    --pwa-strategy=none \
+    --dart-define=API_BASE_URL=${API_BASE_URL} \
+    --dart-define=FIREBASE_API_KEY=${FIREBASE_API_KEY} \
+    --dart-define=FIREBASE_WEB_APP_ID=${FIREBASE_WEB_APP_ID} \
+    --dart-define=FIREBASE_VAPID_KEY=${FIREBASE_VAPID_KEY}
 
 # ---------------------------------------------------------------------------
 # Stage 2 - serve the static bundle with nginx

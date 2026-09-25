@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:my_school_teacher/core/notifications/app_notification.dart';
+import 'package:my_school_teacher/core/notifications/browser_notification.dart';
+import 'package:my_school_teacher/core/notifications/firebase_web_config.dart';
 import 'package:my_school_teacher/core/notifications/push_notification_service.dart';
 
 const _channelId = 'high_importance_channel';
@@ -108,7 +110,6 @@ class FcmPushNotificationService implements PushNotificationService {
   final _taps = StreamController<AppNotification>.broadcast();
 
   String? _tokenCache;
-  StreamSubscription<String>? _tokenSubscription;
 
   AppNotification? _launchedByNotification;
   bool _initialized = false;
@@ -119,25 +120,30 @@ class FcmPushNotificationService implements PushNotificationService {
       return;
     }
     _initialized = true;
-    await Firebase.initializeApp();
-
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-
-    const settings = InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-      iOS: DarwinInitializationSettings(),
-    );
-    await _localNotifications.initialize(
-      settings: settings,
-      onDidReceiveNotificationResponse: (response) {
-        final notification = _decode(response.payload);
-        if (notification != null) {
-          _taps.add(notification);
-        }
-      },
+    await Firebase.initializeApp(
+      options: kIsWeb ? TeacherFirebaseWeb.options : null,
     );
 
-    await requestPermission();
+    if (!kIsWeb) {
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    }
+
+    if (!kIsWeb) {
+      const settings = InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        iOS: DarwinInitializationSettings(),
+      );
+      await _localNotifications.initialize(
+        settings: settings,
+        onDidReceiveNotificationResponse: (response) {
+          final notification = _decode(response.payload);
+          if (notification != null) {
+            _taps.add(notification);
+          }
+        },
+      );
+      await requestPermission();
+    }
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       await _messagingInstance.setForegroundNotificationPresentationOptions(
         alert: true,
@@ -146,31 +152,35 @@ class FcmPushNotificationService implements PushNotificationService {
       );
     }
 
-    _tokenSubscription = _messagingInstance.onTokenRefresh.listen(
-      (token) => _tokenCache = token,
-    );
+    _messagingInstance.onTokenRefresh.listen((token) => _tokenCache = token);
 
     await _warmUpToken();
 
     FirebaseMessaging.onMessage.listen((message) {
+      final notification = _fromRemoteMessage(message);
+      if (kIsWeb) {
+        showBrowserNotification(
+          title: notification.title,
+          body: notification.body,
+        );
+        return;
+      }
       if (!shouldShowLocalForegroundNotification(
         message,
         defaultTargetPlatform,
       )) {
         return;
       }
-      _showForegroundNotification(AppNotification.fromMessageMap(message.data));
+      _showForegroundNotification(notification);
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      _taps.add(AppNotification.fromMessageMap(message.data));
+      _taps.add(_fromRemoteMessage(message));
     });
 
     final initialMessage = await _messagingInstance.getInitialMessage();
     if (initialMessage != null) {
-      _launchedByNotification = AppNotification.fromMessageMap(
-        initialMessage.data,
-      );
+      _launchedByNotification = _fromRemoteMessage(initialMessage);
     }
   }
 
@@ -186,9 +196,7 @@ class FcmPushNotificationService implements PushNotificationService {
           }
         }
       }
-      _tokenCache = await _messagingInstance.getToken().timeout(
-        const Duration(seconds: 10),
-      );
+      _tokenCache = await _readToken();
     } on PlatformException {
       // FirebaseInstallations 403 / APNs errors
     } on Exception {
@@ -213,7 +221,9 @@ class FcmPushNotificationService implements PushNotificationService {
           IOSFlutterLocalNotificationsPlugin
         >()
         ?.requestPermissions(alert: true, badge: true, sound: true);
-    return settings.authorizationStatus == AuthorizationStatus.authorized;
+    final status = settings.authorizationStatus;
+    return status == AuthorizationStatus.authorized ||
+        status == AuthorizationStatus.provisional;
   }
 
   @override
@@ -229,9 +239,13 @@ class FcmPushNotificationService implements PushNotificationService {
           return null;
         }
       }
-      final token = await _messagingInstance.getToken().timeout(
-        const Duration(seconds: 10),
-      );
+      if (kIsWeb) {
+        final allowed = await requestPermission();
+        if (!allowed) {
+          return null;
+        }
+      }
+      final token = await _readToken();
       _tokenCache = token;
       return token;
     } on PlatformException {
@@ -247,6 +261,26 @@ class FcmPushNotificationService implements PushNotificationService {
   @override
   Future<AppNotification?> initialNotification() async =>
       _launchedByNotification;
+
+  Future<String?> _readToken() {
+    return _messagingInstance
+        .getToken(
+          vapidKey: kIsWeb && TeacherFirebaseWeb.vapidKey.isNotEmpty
+              ? TeacherFirebaseWeb.vapidKey
+              : null,
+        )
+        .timeout(const Duration(seconds: 10));
+  }
+
+  AppNotification _fromRemoteMessage(RemoteMessage message) {
+    final data = Map<String, dynamic>.from(message.data);
+    return AppNotification(
+      title: message.notification?.title ?? data['title'] as String?,
+      body: message.notification?.body ?? data['body'] as String?,
+      route: (data['route'] ?? data['type']) as String?,
+      data: data,
+    );
+  }
 
   Future<void> _showForegroundNotification(AppNotification notification) async {
     await _localNotifications.show(

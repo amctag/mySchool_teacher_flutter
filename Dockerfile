@@ -16,7 +16,7 @@ ARG API_BASE_URL=https://amctag-my-school.38f0fz.easypanel.host
 # (Project settings → Cloud Messaging → Web Push certificates).
 ARG FIREBASE_WEB_APP_ID=1:756524911884:web:f145cca98f3f37c8398d29
 ARG FIREBASE_API_KEY=AIzaSyCT1WLuTArbf8dGVMrEfhWFrMsj2B3JqMg
-ARG FIREBASE_VAPID_KEY=
+ARG FIREBASE_VAPID_KEY=nBGo3RdBGObVk1_me8rcci6ww6fDJOIvNy7Wd0fk_yJmdOXC4bErjDlhLesopMHtRsNKWsfOiTFLVTrMOR8xgwqQ
 
 # Dependency layer: only re-runs when the pubspec files change.
 COPY pubspec.yaml pubspec.lock ./

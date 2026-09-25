@@ -90,14 +90,9 @@ flutter build web --release --dart-define=API_BASE_URL=https://api.example.com
 - **In Easypanel**, set it as a *build arg* (`API_BASE_URL=<your backend URL>`).
 - The teacher web Firebase app is already in the build
   (`1:756524911884:web:f145cca98f3f37c8398d29`). Do not put it in the backend `.env`.
-- Browser push still needs the VAPID public key as a **teacher** build arg
-  (Firebase → Project settings → Cloud Messaging → Web Push certificates):
-
-  ```text
-  FIREBASE_VAPID_KEY=YOUR_PUBLIC_VAPID_KEY
-  ```
-
-  The phone app does not use this key.
+- The Web Push public key is already the Docker default `FIREBASE_VAPID_KEY`.
+  The phone app does not use it. A teacher deploy picks it up with no extra
+  environment variable.
   If your Easypanel version has no build-arg field, edit the `ARG` default in
   `Dockerfile`, commit and redeploy.
 - The value is a **public URL** – it is embedded in `main.dart.js` on purpose.

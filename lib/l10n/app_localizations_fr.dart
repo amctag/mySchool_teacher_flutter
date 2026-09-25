@@ -400,6 +400,35 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noNotifications => 'Aucune notification pour le moment.';
 
   @override
+  String get tasks => 'Tâches';
+
+  @override
+  String get noTasks => 'Aucune tâche pour le moment.';
+
+  @override
+  String get openTasks => 'Ouvertes';
+
+  @override
+  String get completedTasks => 'Terminées';
+
+  @override
+  String get markTaskDone => 'Marquer terminé';
+
+  @override
+  String get noOpenTasks => 'Aucune tâche en cours.';
+
+  @override
+  String openTasksCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tâches ouvertes',
+      one: '1 tâche ouverte',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get noActivities => 'Il n’y a pas encore d’activités.';
 
   @override

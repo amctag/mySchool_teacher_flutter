@@ -145,6 +145,18 @@
   "noAnnouncements": "لا توجد إشعارات حتى الآن.",
   "notifications": "الإشعارات",
   "noNotifications": "لا توجد إشعارات حتى الآن.",
+  "tasks": "المهام",
+  "noTasks": "لا توجد مهام حتى الآن.",
+  "openTasks": "مفتوحة",
+  "completedTasks": "مكتملة",
+  "markTaskDone": "تم الإنجاز",
+  "noOpenTasks": "لا توجد مهام مفتوحة.",
+  "openTasksCount": "{count, plural, =1{مهمة مفتوحة واحدة} other{{count} مهام مفتوحة}}",
+  "@openTasksCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "noActivities": "لا توجد نشاطات حتى الآن.",
   "noAlbums": "لا توجد ألبومات حتى الآن.",
   "noPublishedPhotos": "لم يتم نشر صور في هذا الألبوم.",

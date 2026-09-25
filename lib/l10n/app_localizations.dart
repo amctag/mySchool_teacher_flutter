@@ -820,6 +820,48 @@ abstract class AppLocalizations {
   /// **'No notifications yet.'**
   String get noNotifications;
 
+  /// No description provided for @tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks'**
+  String get tasks;
+
+  /// No description provided for @noTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks yet.'**
+  String get noTasks;
+
+  /// No description provided for @openTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get openTasks;
+
+  /// No description provided for @completedTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completedTasks;
+
+  /// No description provided for @markTaskDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark done'**
+  String get markTaskDone;
+
+  /// No description provided for @noOpenTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re all caught up.'**
+  String get noOpenTasks;
+
+  /// No description provided for @openTasksCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 open task} other{{count} open tasks}}'**
+  String openTasksCount(int count);
+
   /// No description provided for @noActivities.
   ///
   /// In en, this message translates to:

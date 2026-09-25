@@ -16,6 +16,7 @@ import 'package:my_school_teacher/models/teacher_notice.dart';
 import 'package:my_school_teacher/models/teacher_attendance.dart';
 import 'package:my_school_teacher/models/teacher_push_notification.dart';
 import 'package:my_school_teacher/models/teacher_schedule.dart';
+import 'package:my_school_teacher/models/teacher_task.dart';
 
 class TeacherRepository {
   const TeacherRepository({required TeacherDataSource dataSource})
@@ -264,5 +265,17 @@ class TeacherRepository {
       }
     }
     return items;
+  }
+
+  Future<List<TeacherTask>> tasks({bool force = false}) async {
+    final rows = await _dataSource.fetchTeacherTasks(forceRefresh: force);
+    return rows
+        .map(TeacherTask.fromApiJson)
+        .toList(growable: false);
+  }
+
+  Future<TeacherTask> completeTask(int taskId) async {
+    final row = await _dataSource.completeTeacherTask(taskId);
+    return TeacherTask.fromApiJson(row);
   }
 }

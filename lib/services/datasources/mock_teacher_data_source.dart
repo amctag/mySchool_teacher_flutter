@@ -456,6 +456,25 @@ class MockTeacherDataSource implements TeacherDataSource {
     },
   ];
 
+  final List<Map<String, dynamic>> _tasks = [
+    {
+      'id': 1,
+      'title': 'Submit midterm grades',
+      'description': 'Please enter all midterm grades in the grades section.',
+      'createdAt': '2026-09-22T10:00:00.000Z',
+      'isCompleted': false,
+      'completedAt': null,
+    },
+    {
+      'id': 2,
+      'title': 'Confirm weekly schedule',
+      'description': 'Review your weekly schedule and report any conflicts.',
+      'createdAt': '2026-09-20T08:00:00.000Z',
+      'isCompleted': true,
+      'completedAt': '2026-09-20T12:00:00.000Z',
+    },
+  ];
+
   String _password = 'school';
 
   @override
@@ -1091,6 +1110,30 @@ class MockTeacherDataSource implements TeacherDataSource {
   }) async {
     await _pause();
     return _copyList(_notifications);
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchTeacherTasks({
+    bool forceRefresh = false,
+  }) async {
+    await _pause();
+    return _copyList(_tasks);
+  }
+
+  @override
+  Future<Map<String, dynamic>> completeTeacherTask(int taskId) async {
+    await _pause();
+    final index = _tasks.indexWhere((item) => item['id'] == taskId);
+    if (index < 0) {
+      throw StateError('Task not found');
+    }
+    final now = DateTime.now().toUtc().toIso8601String();
+    _tasks[index] = {
+      ..._tasks[index],
+      'isCompleted': true,
+      'completedAt': now,
+    };
+    return Map<String, dynamic>.from(_tasks[index]);
   }
 
   @override

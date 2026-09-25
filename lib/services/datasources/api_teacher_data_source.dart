@@ -379,6 +379,24 @@ class ApiTeacherDataSource implements TeacherDataSource {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> fetchTeacherTasks({
+    bool forceRefresh = false,
+  }) async {
+    final json = await _api.get(
+      '/teacher/me/tasks',
+      forceRefresh: forceRefresh,
+    );
+    return ((json['tasks'] as List<dynamic>?) ?? [])
+        .map((item) => Map<String, dynamic>.from(item as Map))
+        .toList();
+  }
+
+  @override
+  Future<Map<String, dynamic>> completeTeacherTask(int taskId) async {
+    return _api.patch('/teacher/me/tasks/$taskId/complete');
+  }
+
+  @override
   Future<void> createNotice(UpsertNoticeRequest request) async {
     await _api.post(
       '/teacher/me/notices',

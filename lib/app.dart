@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:my_school_teacher/controllers/auth_controller.dart';
 import 'package:my_school_teacher/controllers/locale_controller.dart';
 import 'package:my_school_teacher/controllers/notifications_controller.dart';
+import 'package:my_school_teacher/controllers/tasks_controller.dart';
 import 'package:my_school_teacher/controllers/theme_controller.dart';
 import 'package:my_school_teacher/core/extensions/context_x.dart';
 import 'package:my_school_teacher/core/navigation/app_navigator.dart';
@@ -116,12 +117,21 @@ class _SessionGate extends StatelessWidget {
           case AuthStatus.loading:
             return const _SplashPage();
           case AuthStatus.authenticated:
-            return ChangeNotifierProvider(
-              create: (context) => NotificationsController(
-                repository: context.read<TeacherRepository>(),
-                preferences: context.read<AppPreferences>(),
-                personId: auth.state.account!.id,
-              )..load(force: true),
+            return MultiProvider(
+              providers: [
+                ChangeNotifierProvider(
+                  create: (context) => NotificationsController(
+                    repository: context.read<TeacherRepository>(),
+                    preferences: context.read<AppPreferences>(),
+                    personId: auth.state.account!.id,
+                  )..load(force: true),
+                ),
+                ChangeNotifierProvider(
+                  create: (context) => TasksController(
+                    repository: context.read<TeacherRepository>(),
+                  )..load(force: true),
+                ),
+              ],
               child: HomePage(account: auth.state.account!),
             );
           case AuthStatus.unauthenticated:

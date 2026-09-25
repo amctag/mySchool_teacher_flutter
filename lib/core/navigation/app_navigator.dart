@@ -20,6 +20,7 @@ import 'package:my_school_teacher/controllers/notice_composer_controller.dart';
 import 'package:my_school_teacher/controllers/notices_controller.dart';
 import 'package:my_school_teacher/controllers/notifications_controller.dart';
 import 'package:my_school_teacher/controllers/schedule_controller.dart';
+import 'package:my_school_teacher/controllers/tasks_controller.dart';
 import 'package:my_school_teacher/models/account.dart';
 import 'package:my_school_teacher/models/grade_assessment.dart';
 import 'package:my_school_teacher/models/teacher_attendance.dart';
@@ -54,6 +55,7 @@ import 'package:my_school_teacher/views/profile/teacher_profile_page.dart';
 import 'package:my_school_teacher/views/schedule/schedule_page.dart';
 import 'package:my_school_teacher/views/settings/language_page.dart';
 import 'package:my_school_teacher/views/settings/settings_page.dart';
+import 'package:my_school_teacher/views/tasks/tasks_page.dart';
 import 'package:provider/provider.dart';
 
 abstract final class AppNavigator {
@@ -206,6 +208,34 @@ abstract final class AppNavigator {
         create: (_) =>
             AnnouncementsController(repository: repository)..load(),
         child: const AnnouncementsPage(),
+      ),
+    );
+  }
+
+  static Future<void> tasks(BuildContext context) {
+    TasksController? existing;
+    try {
+      existing = context.read<TasksController>();
+    } on ProviderNotFoundException {
+      existing = null;
+    }
+    if (existing != null) {
+      existing.load(force: true);
+      return _push(
+        context,
+        ChangeNotifierProvider<TasksController>.value(
+          value: existing,
+          child: const TasksPage(),
+        ),
+      );
+    }
+    final repository = _repository(context);
+    return _push(
+      context,
+      ChangeNotifierProvider(
+        create: (_) =>
+            TasksController(repository: repository)..load(force: true),
+        child: const TasksPage(),
       ),
     );
   }
@@ -398,6 +428,8 @@ abstract final class AppNavigator {
         await notices(context);
       case 'announcements' || 'announcement':
         await announcements(context);
+      case 'tasks' || 'task':
+        await tasks(context);
       case 'activities' || 'activity':
         await activities(context);
       case 'albums' || 'album':

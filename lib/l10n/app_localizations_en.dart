@@ -394,6 +394,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noNotifications => 'No notifications yet.';
 
   @override
+  String get tasks => 'Tasks';
+
+  @override
+  String get noTasks => 'No tasks yet.';
+
+  @override
+  String get openTasks => 'Open';
+
+  @override
+  String get completedTasks => 'Completed';
+
+  @override
+  String get markTaskDone => 'Mark done';
+
+  @override
+  String get noOpenTasks => 'You\'re all caught up.';
+
+  @override
+  String openTasksCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count open tasks',
+      one: '1 open task',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get noActivities => 'There are no activities yet.';
 
   @override

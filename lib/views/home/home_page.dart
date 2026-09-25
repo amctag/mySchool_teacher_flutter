@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:my_school_teacher/controllers/notifications_controller.dart';
+import 'package:my_school_teacher/controllers/tasks_controller.dart';
 import 'package:my_school_teacher/core/extensions/context_x.dart';
 import 'package:my_school_teacher/core/navigation/app_navigator.dart';
 import 'package:my_school_teacher/models/account.dart';
+import 'package:my_school_teacher/models/teacher_task.dart';
 import 'package:my_school_teacher/views/widgets/brand_app_bar.dart';
 import 'package:my_school_teacher/views/widgets/feature_tile.dart';
 
@@ -15,6 +17,11 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final destinations = [
+      _HomeTile(
+        context.l10n.tasks,
+        Icons.task_alt_rounded,
+        AppNavigator.tasks,
+      ),
       _HomeTile(
         context.l10n.agenda,
         Icons.edit_note_rounded,
@@ -134,6 +141,8 @@ class HomePage extends StatelessWidget {
                       ),
                     ],
                     const SizedBox(height: 18),
+                    const _HomeTasksCard(),
+                    const SizedBox(height: 18),
                     Text(
                       context.l10n.teacherHomeSubtitle,
                       style: context.textStyles.titleMedium,
@@ -179,10 +188,124 @@ class HomePage extends StatelessWidget {
   }
 }
 
+class _HomeTasksCard extends StatelessWidget {
+  const _HomeTasksCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<TasksController>(
+      builder: (context, controller, _) {
+        final open = controller.openTasks.take(3).toList(growable: false);
+        final openCount = controller.openCount;
+
+        return Material(
+          color: context.colors.surfaceContainerHighest.withValues(alpha: 0.55),
+          borderRadius: BorderRadius.circular(20),
+          child: InkWell(
+            key: const Key('home_tasks_card'),
+            borderRadius: BorderRadius.circular(20),
+            onTap: () => AppNavigator.tasks(context),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: context.colors.primary,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.task_alt_rounded,
+                          color: context.colors.onPrimary,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              context.l10n.tasks,
+                              style: context.textStyles.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            Text(
+                              openCount == 0
+                                  ? context.l10n.noOpenTasks
+                                  : context.l10n.openTasksCount(openCount),
+                              style: context.textStyles.bodySmall?.copyWith(
+                                color: context.colors.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                    ],
+                  ),
+                  if (open.isNotEmpty) ...[
+                    const SizedBox(height: 14),
+                    ...open.map(
+                      (task) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _HomeTaskRow(task: task),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _HomeTaskRow extends StatelessWidget {
+  const _HomeTaskRow({required this.task});
+
+  final TeacherTask task;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          Icons.circle_outlined,
+          size: 16,
+          color: context.colors.primary,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            task.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.textStyles.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _HomeTile {
   const _HomeTile(this.label, this.icon, this.open);
 
   final String label;
   final IconData icon;
-  final Future<void> Function(BuildContext context) open;
+  final void Function(BuildContext context) open;
 }

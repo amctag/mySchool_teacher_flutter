@@ -145,6 +145,18 @@
   "noAnnouncements": "There are no notices yet.",
   "notifications": "Notifications",
   "noNotifications": "No notifications yet.",
+  "tasks": "Tasks",
+  "noTasks": "No tasks yet.",
+  "openTasks": "Open",
+  "completedTasks": "Completed",
+  "markTaskDone": "Mark done",
+  "noOpenTasks": "You're all caught up.",
+  "openTasksCount": "{count, plural, =1{1 open task} other{{count} open tasks}}",
+  "@openTasksCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "noActivities": "There are no activities yet.",
   "noAlbums": "There are no albums yet.",
   "noPublishedPhotos": "No photos have been published in this album.",

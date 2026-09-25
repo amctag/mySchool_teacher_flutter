@@ -145,6 +145,18 @@
   "noAnnouncements": "Il n’y a pas encore d’avis.",
   "notifications": "Notifications",
   "noNotifications": "Aucune notification pour le moment.",
+  "tasks": "Tâches",
+  "noTasks": "Aucune tâche pour le moment.",
+  "openTasks": "Ouvertes",
+  "completedTasks": "Terminées",
+  "markTaskDone": "Marquer terminé",
+  "noOpenTasks": "Aucune tâche en cours.",
+  "openTasksCount": "{count, plural, =1{1 tâche ouverte} other{{count} tâches ouvertes}}",
+  "@openTasksCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "noActivities": "Il n’y a pas encore d’activités.",
   "noAlbums": "Il n’y a pas encore d’albums.",
   "noPublishedPhotos": "Aucune photo n’a été publiée dans cet album.",

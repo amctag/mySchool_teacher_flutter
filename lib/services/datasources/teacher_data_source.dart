@@ -127,4 +127,10 @@ abstract interface class TeacherDataSource {
   Future<List<Map<String, dynamic>>> fetchNotifications({
     bool forceRefresh = false,
   });
+
+  Future<List<Map<String, dynamic>>> fetchTeacherTasks({
+    bool forceRefresh = false,
+  });
+
+  Future<Map<String, dynamic>> completeTeacherTask(int taskId);
 }

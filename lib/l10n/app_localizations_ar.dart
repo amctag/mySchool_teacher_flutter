@@ -384,6 +384,35 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noNotifications => 'لا توجد إشعارات حتى الآن.';
 
   @override
+  String get tasks => 'المهام';
+
+  @override
+  String get noTasks => 'لا توجد مهام حتى الآن.';
+
+  @override
+  String get openTasks => 'مفتوحة';
+
+  @override
+  String get completedTasks => 'مكتملة';
+
+  @override
+  String get markTaskDone => 'تم الإنجاز';
+
+  @override
+  String get noOpenTasks => 'لا توجد مهام مفتوحة.';
+
+  @override
+  String openTasksCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مهام مفتوحة',
+      one: 'مهمة مفتوحة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get noActivities => 'لا توجد نشاطات حتى الآن.';
 
   @override

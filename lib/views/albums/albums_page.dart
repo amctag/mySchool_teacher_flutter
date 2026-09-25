@@ -8,6 +8,7 @@ import 'package:my_school_teacher/core/state/load_state.dart';
 import 'package:my_school_teacher/models/teacher_media.dart';
 import 'package:my_school_teacher/controllers/media_controllers.dart';
 import 'package:my_school_teacher/views/widgets/brand_app_bar.dart';
+import 'package:my_school_teacher/views/widgets/remote_image.dart';
 import 'package:my_school_teacher/views/widgets/section_card.dart';
 import 'package:my_school_teacher/views/widgets/state_views.dart';
 
@@ -78,8 +79,8 @@ class _AlbumCard extends StatelessWidget {
             if (hasCover) ...[
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  cover,
+                child: RemoteImage(
+                  url: cover,
                   height: 140,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -186,8 +187,8 @@ class AlbumDetailsPage extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        photos[index].imageLink,
+                      child: RemoteImage(
+                        url: photos[index].imageLink,
                         fit: BoxFit.cover,
                         errorBuilder: (_, _, _) => const ColoredBox(
                           color: Color(0x11000000),

@@ -7,6 +7,7 @@ import 'package:my_school_teacher/core/services/external_link_service.dart';
 import 'package:my_school_teacher/models/teacher_agenda_item.dart';
 import 'package:my_school_teacher/services/repositories/teacher_repository.dart';
 import 'package:my_school_teacher/views/widgets/brand_app_bar.dart';
+import 'package:my_school_teacher/views/widgets/remote_image.dart';
 import 'package:my_school_teacher/views/widgets/section_card.dart';
 import 'package:my_school_teacher/views/widgets/status_badge.dart';
 
@@ -384,8 +385,8 @@ class _AttachmentCard extends StatelessWidget {
               if (previewUrl != null)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.network(
-                    previewUrl!,
+                  child: RemoteImage(
+                    url: previewUrl!,
                     width: 56,
                     height: 56,
                     fit: BoxFit.cover,
@@ -462,8 +463,8 @@ class _ImagePreviewDialog extends StatelessWidget {
               child: InteractiveViewer(
                 maxScale: 4,
                 child: Center(
-                  child: Image.network(
-                    link,
+                  child: RemoteImage(
+                    url: link,
                     fit: BoxFit.contain,
                     errorBuilder: (_, _, _) => Container(
                       color: Colors.black,

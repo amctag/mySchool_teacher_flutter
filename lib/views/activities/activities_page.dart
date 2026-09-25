@@ -8,6 +8,7 @@ import 'package:my_school_teacher/core/state/load_state.dart';
 import 'package:my_school_teacher/models/teacher_media.dart';
 import 'package:my_school_teacher/controllers/media_controllers.dart';
 import 'package:my_school_teacher/views/widgets/brand_app_bar.dart';
+import 'package:my_school_teacher/views/widgets/remote_image.dart';
 import 'package:my_school_teacher/views/widgets/section_card.dart';
 import 'package:my_school_teacher/views/widgets/state_views.dart';
 import 'package:my_school_teacher/views/widgets/status_badge.dart';
@@ -199,7 +200,7 @@ class ActivityDetailsPage extends StatelessWidget {
                   const SizedBox(height: 16),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.network(image, fit: BoxFit.cover),
+                    child: RemoteImage(url: image, fit: BoxFit.cover),
                   ),
                 ],
                 const SizedBox(height: 16),

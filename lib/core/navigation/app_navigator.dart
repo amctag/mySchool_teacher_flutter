@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_school_teacher/core/notifications/app_notification.dart';
+import 'package:my_school_teacher/core/navigation/web_route_sync.dart';
 import 'package:my_school_teacher/core/persistence/app_preferences.dart';
 import 'package:my_school_teacher/controllers/activity_composer_controller.dart';
 import 'package:my_school_teacher/controllers/announcement_composer_controller.dart';
@@ -67,10 +68,14 @@ abstract final class AppNavigator {
   }
 
   static Future<void> profile(BuildContext context) =>
-      _push(context, const ProfilePage());
+      _push(context, const ProfilePage(), webPath: AppRoutePaths.profile);
 
   static Future<void> teacherProfile(BuildContext context, Account account) =>
-      _push(context, TeacherProfilePage(account: account));
+      _push(
+        context,
+        TeacherProfilePage(account: account),
+        webPath: AppRoutePaths.profile,
+      );
 
   static Future<void> changePassword(BuildContext context) {
     final repository = _repository(context);
@@ -91,6 +96,7 @@ abstract final class AppNavigator {
         create: (_) => ScheduleController(repository: repository)..load(),
         child: const SchedulePage(),
       ),
+      webPath: AppRoutePaths.schedule,
     );
   }
 
@@ -102,6 +108,7 @@ abstract final class AppNavigator {
         create: (_) => AgendaController(repository: repository)..load(),
         child: const AgendaPage(),
       ),
+      webPath: AppRoutePaths.agenda,
     );
   }
 
@@ -144,6 +151,7 @@ abstract final class AppNavigator {
         create: (_) => GradesController(repository: repository)..load(),
         child: const GradesPage(),
       ),
+      webPath: AppRoutePaths.grades,
     );
   }
 
@@ -155,6 +163,7 @@ abstract final class AppNavigator {
         create: (_) => AttendancesController(repository: repository)..load(),
         child: const AttendancesPage(),
       ),
+      webPath: AppRoutePaths.attendance,
     );
   }
 
@@ -197,6 +206,7 @@ abstract final class AppNavigator {
         create: (_) => NoticesController(repository: repository)..load(),
         child: const NoticesPage(),
       ),
+      webPath: AppRoutePaths.notices,
     );
   }
 
@@ -209,6 +219,7 @@ abstract final class AppNavigator {
             AnnouncementsController(repository: repository)..load(),
         child: const AnnouncementsPage(),
       ),
+      webPath: AppRoutePaths.announcements,
     );
   }
 
@@ -237,6 +248,7 @@ abstract final class AppNavigator {
             TasksController(repository: repository)..load(force: true),
         child: const TasksPage(),
       ),
+      webPath: AppRoutePaths.tasks,
     );
   }
 
@@ -263,15 +275,16 @@ abstract final class AppNavigator {
   ) {
     return _push(context, AnnouncementDetailsPage(announcement: announcement));
   }
-
   static Future<void> activities(BuildContext context) {
     final repository = _repository(context);
     return _push(
       context,
       ChangeNotifierProvider(
-        create: (_) => ActivitiesController(repository: repository)..load(),
+        create: (_) =>
+            ActivitiesController(repository: repository)..load(),
         child: const ActivitiesPage(),
       ),
+      webPath: AppRoutePaths.activities,
     );
   }
 
@@ -298,15 +311,16 @@ abstract final class AppNavigator {
   ) {
     return _push(context, ActivityDetailsPage(activity: activity));
   }
-
   static Future<void> albums(BuildContext context) {
     final repository = _repository(context);
     return _push(
       context,
       ChangeNotifierProvider(
-        create: (_) => AlbumsController(repository: repository)..load(),
+        create: (_) =>
+            AlbumsController(repository: repository)..load(),
         child: const AlbumsPage(),
       ),
+      webPath: AppRoutePaths.albums,
     );
   }
 
@@ -328,15 +342,16 @@ abstract final class AppNavigator {
       ),
     );
   }
-
   static Future<void> myClasses(BuildContext context) {
     final repository = _repository(context);
     return _push(
       context,
       ChangeNotifierProvider(
-        create: (_) => MyClassesController(repository: repository)..load(),
+        create: (_) =>
+            MyClassesController(repository: repository)..load(),
         child: const MyClassesPage(),
       ),
+      webPath: AppRoutePaths.classes,
     );
   }
 
@@ -349,6 +364,7 @@ abstract final class AppNavigator {
             AllClassSchedulesController(repository: repository)..load(),
         child: const AllClassSchedulesPage(),
       ),
+      webPath: AppRoutePaths.classSchedules,
     );
   }
 
@@ -368,7 +384,7 @@ abstract final class AppNavigator {
   }
 
   static Future<void> settings(BuildContext context) =>
-      _push(context, const SettingsPage());
+      _push(context, const SettingsPage(), webPath: AppRoutePaths.settings);
 
   static Future<void> notifications(BuildContext context) {
     NotificationsController? existing;
@@ -385,6 +401,7 @@ abstract final class AppNavigator {
           value: existing,
           child: const NotificationsPage(),
         ),
+        webPath: AppRoutePaths.notifications,
       );
     }
     final repository = _repository(context);
@@ -400,11 +417,38 @@ abstract final class AppNavigator {
         )..load(force: true, markAsSeen: true),
         child: const NotificationsPage(),
       ),
+      webPath: AppRoutePaths.notifications,
     );
   }
 
   static Future<void> language(BuildContext context) =>
-      _push(context, const LanguagePage());
+      _push(context, const LanguagePage(), webPath: AppRoutePaths.language);
+
+  /// Opens the top level feature that matches a browser [path].
+  ///
+  /// Used by the web router when a user opens or navigates to a deep link such
+  /// as `/agenda`. Unknown paths are ignored so the caller can fall back to the
+  /// dashboard.
+  static Future<void> openFeaturePath(BuildContext context, String path) {
+    return switch (AppRoutePaths.normalize(path)) {
+      AppRoutePaths.tasks => tasks(context),
+      AppRoutePaths.agenda => agenda(context),
+      AppRoutePaths.grades => grades(context),
+      AppRoutePaths.attendance => attendances(context),
+      AppRoutePaths.notices => notices(context),
+      AppRoutePaths.announcements => announcements(context),
+      AppRoutePaths.classes => myClasses(context),
+      AppRoutePaths.schedule => schedule(context),
+      AppRoutePaths.activities => activities(context),
+      AppRoutePaths.albums => albums(context),
+      AppRoutePaths.classSchedules => allClassSchedules(context),
+      AppRoutePaths.notifications => notifications(context),
+      AppRoutePaths.profile => profile(context),
+      AppRoutePaths.settings => settings(context),
+      AppRoutePaths.language => language(context),
+      _ => Future<void>.value(),
+    };
+  }
 
   static Future<void> routeFromNotification(
     BuildContext context,
@@ -443,9 +487,13 @@ abstract final class AppNavigator {
     }
   }
 
-  static Future<void> _push(BuildContext context, Widget page) {
+  static Future<void> _push(
+    BuildContext context,
+    Widget page, {
+    String? webPath,
+  }) {
     final repository = _repository(context);
-    return Navigator.of(context).push<void>(
+    final future = Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => Provider<TeacherRepository>.value(
           value: repository,
@@ -453,5 +501,9 @@ abstract final class AppNavigator {
         ),
       ),
     );
+    if (webPath != null) {
+      WebRouteSync.pushUnlessSilent(webPath);
+    }
+    return future;
   }
 }

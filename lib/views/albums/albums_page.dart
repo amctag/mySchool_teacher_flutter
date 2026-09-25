@@ -167,26 +167,35 @@ class AlbumDetailsPage extends StatelessWidget {
               message: context.l10n.noPublishedPhotos,
             )
           else
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: photos.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-              ),
-              itemBuilder: (context, index) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    photos[index].imageLink,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => const ColoredBox(
-                      color: Color(0x11000000),
-                      child: Icon(Icons.broken_image_outlined),
-                    ),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // Keep photo tiles close to their mobile size on wide
+                // desktop/browser windows instead of stretching 2 huge cells.
+                final columns = (constraints.maxWidth / 160)
+                    .floor()
+                    .clamp(2, 6);
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: photos.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: columns,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
                   ),
+                  itemBuilder: (context, index) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        photos[index].imageLink,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => const ColoredBox(
+                          color: Color(0x11000000),
+                          child: Icon(Icons.broken_image_outlined),
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),

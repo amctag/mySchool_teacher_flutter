@@ -153,21 +153,30 @@ class HomePage extends StatelessWidget {
             ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  mainAxisExtent: 128,
-                ),
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final destination = destinations[index];
-                  return FeatureTile(
-                    label: destination.label,
-                    icon: destination.icon,
-                    onTap: () => destination.open(context),
+              sliver: SliverLayoutBuilder(
+                builder: (context, constraints) {
+                  // 3 columns on phones, more columns as the window widens so
+                  // tiles keep a sane size on tablets and desktop browsers.
+                  final columns = (constraints.crossAxisExtent / 160)
+                      .floor()
+                      .clamp(3, 6);
+                  return SliverGrid(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: columns,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      mainAxisExtent: 128,
+                    ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final destination = destinations[index];
+                      return FeatureTile(
+                        label: destination.label,
+                        icon: destination.icon,
+                        onTap: () => destination.open(context),
+                      );
+                    }, childCount: destinations.length),
                   );
-                }, childCount: destinations.length),
+                },
               ),
             ),
           ],

@@ -10,16 +10,22 @@ import 'package:my_school_teacher/services/datasources/api_teacher_data_source.d
 import 'package:my_school_teacher/services/network/teacher_api_client.dart';
 import 'package:my_school_teacher/services/repositories/teacher_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      systemNavigationBarColor: Colors.transparent,
-    ),
-  );
+  // Clean browser URLs (`/dashboard` instead of `/#/dashboard`). No-op on
+  // Android/iOS, so mobile navigation is unaffected.
+  usePathUrlStrategy();
+  if (!kIsWeb) {
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
+      ),
+    );
+  }
   final preferences = AppPreferences(await SharedPreferences.getInstance());
   final repository = TeacherRepository(
     dataSource: ApiTeacherDataSource(

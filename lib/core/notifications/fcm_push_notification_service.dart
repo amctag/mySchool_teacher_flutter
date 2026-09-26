@@ -238,8 +238,16 @@ class FcmPushNotificationService implements PushNotificationService {
         }
         final supported = await FirebaseMessaging.instance.isSupported();
         if (!supported) {
+          if (defaultTargetPlatform == TargetPlatform.iOS) {
+            throw StateError(
+              'On iPhone, Chrome cannot receive web push in a normal tab. '
+              'Open this site in Safari → Share → Add to Home Screen, '
+              'then open MS Teacher from the home icon and tap Allow notifications.',
+            );
+          }
           throw StateError(
-            'This browser does not support web push notifications.',
+            'This mobile browser does not support web push. '
+            'On Android use Chrome. On iPhone use Safari and Add to Home Screen.',
           );
         }
       }

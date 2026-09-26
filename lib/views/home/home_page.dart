@@ -269,7 +269,7 @@ class _WebNotificationBannerState extends State<_WebNotificationBanner> {
       setState(() {
         _busy = false;
         _error = prompt
-            ? 'Could not save this browser for notifications. $error'
+            ? error.toString().replaceFirst('Bad state: ', '')
             : null;
       });
     }

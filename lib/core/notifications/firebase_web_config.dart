@@ -14,11 +14,20 @@ class TeacherFirebaseWeb {
     'FIREBASE_WEB_APP_ID',
     defaultValue: '1:756524911884:web:f145cca98f3f37c8398d29',
   );
-  static const vapidKey = String.fromEnvironment(
+  static const _vapidRaw = String.fromEnvironment(
     'FIREBASE_VAPID_KEY',
     defaultValue:
-        'nBGo3RdBGObVk1_me8rcci6ww6fDJOIvNy7Wd0fk_yJmdOXC4bErjDlhLesopMHtRsNKWsfOiTFLVTrMOR8xgwqQ',
+        'BnBGo3RdBGObVk1_me8rcci6ww6fDJOIvNy7Wd0fk_yJmdOXC4bErjDlhLesopMHtRsNKWsfOiTFLVTrMOR8xgwqQ',
   );
+
+  /// Firebase Web Push keys are 88 characters and start with `B`. A copied
+  /// 87-character value is treated as missing that prefix.
+  static String get vapidKey {
+    if (_vapidRaw.length == 87 && !_vapidRaw.startsWith('B')) {
+      return 'B$_vapidRaw';
+    }
+    return _vapidRaw;
+  }
 
   static const projectId = 'koi-beirut';
   static const messagingSenderId = '756524911884';

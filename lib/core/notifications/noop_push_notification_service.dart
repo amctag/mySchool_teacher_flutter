@@ -15,7 +15,7 @@ class NoopPushNotificationService implements PushNotificationService {
   Future<bool> requestPermission() async => false;
 
   @override
-  Future<String?> getToken() async => null;
+  Future<String?> getToken({bool prompt = true}) async => null;
 
   @override
   Stream<AppNotification> get notificationTaps => _taps.stream;

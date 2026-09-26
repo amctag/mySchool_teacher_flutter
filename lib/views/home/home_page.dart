@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:my_school_teacher/core/notifications/push_notification_service.dart';
+import 'package:my_school_teacher/services/repositories/teacher_repository.dart';
 import 'package:my_school_teacher/controllers/notifications_controller.dart';
 import 'package:my_school_teacher/controllers/tasks_controller.dart';
 import 'package:my_school_teacher/core/extensions/context_x.dart';
@@ -141,6 +144,8 @@ class HomePage extends StatelessWidget {
                       ),
                     ],
                     const SizedBox(height: 18),
+                    if (kIsWeb) const _WebNotificationBanner(),
+                    if (kIsWeb) const SizedBox(height: 18),
                     const _HomeTasksCard(),
                     const SizedBox(height: 18),
                     Text(
@@ -194,6 +199,109 @@ class HomePage extends StatelessWidget {
       return context.l10n.goodAfternoon;
     }
     return context.l10n.goodEvening;
+  }
+}
+
+class _WebNotificationBanner extends StatefulWidget {
+  const _WebNotificationBanner();
+
+  @override
+  State<_WebNotificationBanner> createState() => _WebNotificationBannerState();
+}
+
+class _WebNotificationBannerState extends State<_WebNotificationBanner> {
+  var _busy = false;
+  var _done = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _enable(prompt: false);
+    });
+  }
+
+  Future<void> _enable({required bool prompt}) async {
+    setState(() {
+      _busy = prompt;
+      _error = null;
+    });
+    try {
+      final token = await context.read<PushNotificationService>().getToken(
+        prompt: prompt,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (token == null || token.isEmpty) {
+        if (!prompt) {
+          setState(() => _busy = false);
+          return;
+        }
+        setState(() {
+          _busy = false;
+          _error =
+              'Chrome did not allow notifications. Click the lock icon, set Notifications to Allow, then try again.';
+        });
+        return;
+      }
+      await context.read<TeacherRepository>().saveFcmToken(token);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _busy = false;
+        _done = true;
+      });
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _busy = false;
+        _error = prompt
+            ? 'Could not save this browser for notifications. $error'
+            : null;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_done) {
+      return const SizedBox.shrink();
+    }
+    return Material(
+      color: context.colors.primaryContainer,
+      borderRadius: BorderRadius.circular(14),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Turn on notifications for this browser',
+              style: context.textStyles.titleSmall,
+            ),
+            const SizedBox(height: 8),
+            FilledButton(
+              onPressed: _busy ? null : () => _enable(prompt: true),
+              child: Text(_busy ? 'Waiting for Chrome...' : 'Allow notifications'),
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                _error!,
+                style: context.textStyles.bodySmall?.copyWith(
+                  color: context.colors.error,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }
 

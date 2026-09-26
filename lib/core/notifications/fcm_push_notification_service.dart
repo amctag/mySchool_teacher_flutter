@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:my_school_teacher/core/notifications/app_notification.dart';
 import 'package:my_school_teacher/core/notifications/browser_notification.dart';
@@ -154,7 +153,9 @@ class FcmPushNotificationService implements PushNotificationService {
 
     _messagingInstance.onTokenRefresh.listen((token) => _tokenCache = token);
 
-    await _warmUpToken();
+    if (!kIsWeb) {
+      await _warmUpToken();
+    }
 
     FirebaseMessaging.onMessage.listen((message) {
       final notification = _fromRemoteMessage(message);
@@ -197,9 +198,7 @@ class FcmPushNotificationService implements PushNotificationService {
         }
       }
       _tokenCache = await _readToken();
-    } on PlatformException {
-      // FirebaseInstallations 403 / APNs errors
-    } on Exception {
+    } on Object {
       // Token not ready yet; getToken() will retry on demand
     }
   }
@@ -227,12 +226,20 @@ class FcmPushNotificationService implements PushNotificationService {
   }
 
   @override
-  Future<String?> getToken() async {
+  Future<String?> getToken({bool prompt = true}) async {
     final cached = _tokenCache;
     if (cached != null) {
       return cached;
     }
     try {
+      if (kIsWeb) {
+        final supported = await FirebaseMessaging.instance.isSupported();
+        if (!supported) {
+          throw StateError(
+            'This browser does not support web push notifications.',
+          );
+        }
+      }
       if (defaultTargetPlatform == TargetPlatform.iOS) {
         final apns = await _messagingInstance.getAPNSToken();
         if (apns == null) {
@@ -240,17 +247,28 @@ class FcmPushNotificationService implements PushNotificationService {
         }
       }
       if (kIsWeb) {
-        final allowed = await requestPermission();
-        if (!allowed) {
-          return null;
+        if (prompt) {
+          final allowed = await requestPermission();
+          if (!allowed) {
+            return null;
+          }
+        } else {
+          final settings = await _messagingInstance.getNotificationSettings();
+          final status = settings.authorizationStatus;
+          if (status != AuthorizationStatus.authorized &&
+              status != AuthorizationStatus.provisional) {
+            return null;
+          }
         }
       }
       final token = await _readToken();
       _tokenCache = token;
       return token;
-    } on PlatformException {
-      return null;
-    } on Exception {
+    } on Object catch (error) {
+      debugPrint('FCM getToken failed: $error');
+      if (kIsWeb && prompt) {
+        rethrow;
+      }
       return null;
     }
   }
@@ -268,8 +286,11 @@ class FcmPushNotificationService implements PushNotificationService {
           vapidKey: kIsWeb && TeacherFirebaseWeb.vapidKey.isNotEmpty
               ? TeacherFirebaseWeb.vapidKey
               : null,
+          serviceWorkerScriptPath: kIsWeb
+              ? '/firebase-messaging-sw.js'
+              : null,
         )
-        .timeout(const Duration(seconds: 10));
+        .timeout(const Duration(seconds: 15));
   }
 
   AppNotification _fromRemoteMessage(RemoteMessage message) {

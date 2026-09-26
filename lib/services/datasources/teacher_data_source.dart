@@ -29,6 +29,8 @@ abstract interface class TeacherDataSource {
 
   Future<void> logout();
 
+  Future<void> saveFcmToken(String token);
+
   Future<void> changePassword(String currentPassword, String newPassword);
 
   Future<Map<String, dynamic>> fetchTeacherSchedule();

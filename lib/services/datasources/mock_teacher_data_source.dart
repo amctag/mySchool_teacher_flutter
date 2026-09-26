@@ -1209,6 +1209,9 @@ class MockTeacherDataSource implements TeacherDataSource {
   }
 
   @override
+  Future<void> saveFcmToken(String token) async {}
+
+  @override
   Future<void> logout() async {
     await _pause();
   }

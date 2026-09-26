@@ -44,6 +44,17 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
+  <script>
+    // Register the FCM worker early so getToken() can attach to an active worker.
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' })
+          .catch(function (error) {
+            console.warn('FCM service worker registration failed', error);
+          });
+      });
+    }
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

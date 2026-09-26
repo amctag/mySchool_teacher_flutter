@@ -10,7 +10,9 @@ abstract class PushNotificationService {
   Future<bool> requestPermission();
 
   /// Current registration token for this install, or null when unavailable.
-  Future<String?> getToken();
+  ///
+  /// On web, [prompt] controls whether Chrome's Allow dialog is shown.
+  Future<String?> getToken({bool prompt = true});
 
   /// Emits a notification when the user taps on it (foreground or background).
   Stream<AppNotification> get notificationTaps;

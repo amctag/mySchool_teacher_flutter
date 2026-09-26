@@ -72,6 +72,11 @@ class ApiTeacherDataSource implements TeacherDataSource {
   }
 
   @override
+  Future<void> saveFcmToken(String token) async {
+    await _api.post('/teacher/fcm-token', auth: true, body: {'token': token});
+  }
+
+  @override
   Future<void> logout() async {
     try {
       await _api.post('/teacher/logout', auth: true);

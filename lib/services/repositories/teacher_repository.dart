@@ -44,6 +44,8 @@ class TeacherRepository {
 
   Future<void> logout() => _dataSource.logout();
 
+  Future<void> saveFcmToken(String token) => _dataSource.saveFcmToken(token);
+
   void clearReadCache() => _dataSource.clearReadCache();
 
   bool get teachersCanPublishAgenda => _dataSource.teachersCanPublishAgenda;

@@ -22,12 +22,11 @@ class NoticeEditorPage extends StatefulWidget {
 }
 
 class _NoticeEditorPageState extends State<NoticeEditorPage> {
-  final _titleController = TextEditingController();
   final _contentController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   int? _selectedClassId;
   NoticeTargetType _targetType = NoticeTargetType.section;
-  int? _targetId;
+  final Set<int> _selectedStudentIds = {};
   DateTime _publishDate = DateTime.now();
 
   @override
@@ -35,18 +34,20 @@ class _NoticeEditorPageState extends State<NoticeEditorPage> {
     super.initState();
     final notice = widget.notice;
     if (notice != null) {
-      _titleController.text = notice.title;
       _contentController.text = notice.content;
       _selectedClassId = notice.classId;
       _targetType = notice.targetType;
-      _targetId = notice.targetId;
+      if (notice.targetType == NoticeTargetType.student) {
+        _selectedStudentIds.addAll(
+          notice.targetIds.isNotEmpty ? notice.targetIds : [notice.targetId],
+        );
+      }
       _publishDate = notice.publishDate;
     }
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
     _contentController.dispose();
     super.dispose();
   }
@@ -134,7 +135,7 @@ class _NoticeEditorPageState extends State<NoticeEditorPage> {
                                     ? null
                                     : () => setState(() {
                                         _selectedClassId = null;
-                                        _targetId = null;
+                                        _selectedStudentIds.clear();
                                         _targetType = NoticeTargetType.section;
                                       }),
                                 child: Text(context.l10n.changeClass),
@@ -167,9 +168,9 @@ class _NoticeEditorPageState extends State<NoticeEditorPage> {
                                 final next = value.first;
                                 setState(() {
                                   _targetType = next;
-                                  _targetId = next == NoticeTargetType.section
-                                      ? _selectedClassId
-                                      : null;
+                                  if (next == NoticeTargetType.section) {
+                                    _selectedStudentIds.clear();
+                                  }
                                 });
                                 if (next == NoticeTargetType.student &&
                                     _selectedClassId != null) {
@@ -181,9 +182,25 @@ class _NoticeEditorPageState extends State<NoticeEditorPage> {
                       ),
                       if (_targetType == NoticeTargetType.student) ...[
                         const SizedBox(height: 16),
-                        Text(
-                          context.l10n.selectStudent,
-                          style: context.textStyles.titleSmall,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                context.l10n.selectStudent,
+                                style: context.textStyles.titleSmall,
+                              ),
+                            ),
+                            if (_selectedStudentIds.isNotEmpty)
+                              Text(
+                                context.l10n.studentsSelectedCount(
+                                  _selectedStudentIds.length,
+                                ),
+                                style: context.textStyles.bodySmall?.copyWith(
+                                  color: context.colors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                          ],
                         ),
                         const SizedBox(height: 8),
                         _StudentPicker(
@@ -191,8 +208,14 @@ class _NoticeEditorPageState extends State<NoticeEditorPage> {
                           loading: state.isLoadingStudents(_selectedClassId),
                           failed: state.message != null &&
                               !state.isLoadingStudents(_selectedClassId),
-                          selectedId: _targetId,
-                          onSelect: (id) => setState(() => _targetId = id),
+                          selectedIds: _selectedStudentIds,
+                          onToggle: (id) => setState(() {
+                            if (_selectedStudentIds.contains(id)) {
+                              _selectedStudentIds.remove(id);
+                            } else {
+                              _selectedStudentIds.add(id);
+                            }
+                          }),
                           onRetry: () => context
                               .read<NoticeComposerController>()
                               .loadStudents(_selectedClassId!),
@@ -205,17 +228,6 @@ class _NoticeEditorPageState extends State<NoticeEditorPage> {
                 SectionCard(
                   child: Column(
                     children: [
-                      TextFormField(
-                        controller: _titleController,
-                        decoration: InputDecoration(
-                          labelText: context.l10n.titleLabel,
-                        ),
-                        validator: (value) =>
-                            value == null || value.trim().isEmpty
-                            ? context.l10n.fieldRequired
-                            : null,
-                      ),
-                      const SizedBox(height: 16),
                       TextFormField(
                         controller: _contentController,
                         maxLines: 4,
@@ -281,7 +293,7 @@ class _NoticeEditorPageState extends State<NoticeEditorPage> {
     setState(() {
       _selectedClassId = classId;
       _targetType = NoticeTargetType.section;
-      _targetId = classId;
+      _selectedStudentIds.clear();
     });
   }
 
@@ -309,21 +321,25 @@ class _NoticeEditorPageState extends State<NoticeEditorPage> {
     if (!_formKey.currentState!.validate() || _selectedClassId == null) {
       return;
     }
-    final targetId = _targetType == NoticeTargetType.section
-        ? _selectedClassId
-        : _targetId;
-    if (targetId == null) {
+    if (_targetType == NoticeTargetType.student &&
+        _selectedStudentIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.selectStudent)),
       );
       return;
     }
+    final studentIds = _selectedStudentIds.toList(growable: false);
+    final content = _contentController.text.trim();
     final request = UpsertNoticeRequest(
       classId: _selectedClassId!,
       targetType: _targetType,
-      targetId: targetId,
-      title: _titleController.text.trim(),
-      content: _contentController.text.trim(),
+      targetId: _targetType == NoticeTargetType.section
+          ? _selectedClassId!
+          : studentIds.first,
+      studentIds: _targetType == NoticeTargetType.student ? studentIds : const [],
+      // Title field removed from the form; keep API happy with a short preview.
+      title: content.length <= 80 ? content : '${content.substring(0, 77)}...',
+      content: content,
       publishDate: _publishDate,
       assignmentId: widget.notice?.assignmentId,
     );
@@ -434,16 +450,16 @@ class _StudentPicker extends StatelessWidget {
     required this.students,
     required this.loading,
     required this.failed,
-    required this.selectedId,
-    required this.onSelect,
+    required this.selectedIds,
+    required this.onToggle,
     required this.onRetry,
   });
 
   final List<StudentSummary>? students;
   final bool loading;
   final bool failed;
-  final int? selectedId;
-  final ValueChanged<int> onSelect;
+  final Set<int> selectedIds;
+  final ValueChanged<int> onToggle;
   final VoidCallback onRetry;
 
   @override
@@ -482,10 +498,10 @@ class _StudentPicker extends StatelessWidget {
             contentPadding: EdgeInsets.zero,
             minVerticalPadding: 12,
             leading: CircleAvatar(
-              backgroundColor: student.id == selectedId
+              backgroundColor: selectedIds.contains(student.id)
                   ? context.colors.primary
                   : context.colors.primaryContainer,
-              foregroundColor: student.id == selectedId
+              foregroundColor: selectedIds.contains(student.id)
                   ? context.colors.onPrimary
                   : context.colors.primary,
               child: Text(student.initials),
@@ -494,10 +510,10 @@ class _StudentPicker extends StatelessWidget {
             subtitle: Text(
               '${context.l10n.seatNumberLabel} ${student.seatNumber}',
             ),
-            trailing: student.id == selectedId
-                ? Icon(Icons.check_circle, color: context.colors.primary)
-                : const Icon(Icons.circle_outlined),
-            onTap: () => onSelect(student.id),
+            trailing: selectedIds.contains(student.id)
+                ? Icon(Icons.check_box, color: context.colors.primary)
+                : const Icon(Icons.check_box_outline_blank),
+            onTap: () => onToggle(student.id),
           ),
       ],
     );

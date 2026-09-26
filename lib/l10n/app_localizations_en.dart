@@ -180,7 +180,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get announcements => 'Notice';
+  String get announcements => 'Notices';
 
   @override
   String get announcementDetails => 'Notice details';
@@ -745,7 +745,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Select class, section, and course, then tap Load.';
 
   @override
-  String get selectStudent => 'Select student';
+  String get selectStudent => 'Select students';
+
+  @override
+  String studentsSelectedCount(int count) {
+    return '$count selected';
+  }
 
   @override
   String get sendToEntireClass => 'Entire class';
@@ -782,4 +787,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get departmentLabel => 'Department';
+
+  @override
+  String get activityScope => 'Audience';
+
+  @override
+  String get activityScopeSectionCourse => 'Section + course';
+
+  @override
+  String get activityScopeSection => 'Section';
+
+  @override
+  String get activityScopeClass => 'Class';
+
+  @override
+  String get activityScopeStage => 'Stage';
+
+  @override
+  String get selectStage => 'Select stage';
 }

@@ -62,7 +62,7 @@
       "count": {"type": "int"}
     }
   },
-  "announcements": "Notice",
+  "announcements": "Notices",
   "announcementDetails": "Notice details",
   "attendance": "Attendance",
   "takeAttendance": "Take attendance",
@@ -268,7 +268,13 @@
   "filters": "Filters",
   "loadMore": "Load more",
   "selectFiltersToLoadGrades": "Select class, section, and course, then tap Load.",
-  "selectStudent": "Select student",
+  "selectStudent": "Select students",
+  "studentsSelectedCount": "{count} selected",
+  "@studentsSelectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "sendToEntireClass": "Entire class",
   "changeClass": "Change class",
   "noStudentsInClass": "No students in this class.",
@@ -280,5 +286,11 @@
   "delete": "Delete",
   "deleteItemQuestion": "Delete this item?",
   "titleLabel": "Title",
-  "departmentLabel": "Department"
+  "departmentLabel": "Department",
+  "activityScope": "Audience",
+  "activityScopeSectionCourse": "Section + course",
+  "activityScopeSection": "Section",
+  "activityScopeClass": "Class",
+  "activityScopeStage": "Stage",
+  "selectStage": "Select stage"
 }

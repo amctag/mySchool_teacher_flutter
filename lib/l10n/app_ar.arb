@@ -62,7 +62,7 @@
       "count": {"type": "int"}
     }
   },
-  "announcements": "إشعار",
+  "announcements": "إشعارات",
   "announcementDetails": "تفاصيل الإشعار",
   "attendance": "الحضور",
   "takeAttendance": "تسجيل الحضور",
@@ -266,7 +266,13 @@
   "filters": "تصفية",
   "loadMore": "تحميل المزيد",
   "selectFiltersToLoadGrades": "اختر الصف والشعبة والمادة ثم اضغط تحميل.",
-  "selectStudent": "اختر الطالب",
+  "selectStudent": "اختر الطلاب",
+  "studentsSelectedCount": "{count} محددون",
+  "@studentsSelectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "sendToEntireClass": "الصف بالكامل",
   "changeClass": "تغيير الصف",
   "noStudentsInClass": "لا يوجد طلاب في هذا الصف.",
@@ -278,5 +284,11 @@
   "delete": "حذف",
   "deleteItemQuestion": "هل تريد حذف هذا العنصر؟",
   "titleLabel": "العنوان",
-  "departmentLabel": "القسم"
+  "departmentLabel": "القسم",
+  "activityScope": "الجمهور",
+  "activityScopeSectionCourse": "شعبة ومادة",
+  "activityScopeSection": "شعبة",
+  "activityScopeClass": "صف",
+  "activityScopeStage": "مرحلة",
+  "selectStage": "اختر المرحلة"
 }

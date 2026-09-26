@@ -34,9 +34,11 @@ class MockTeacherDataSource implements TeacherDataSource {
     {
       'id': 1001,
       'class_id': 201,
+      'school_class_id': 2,
       'class_name': 'Grade 2',
       'section_title': 'A',
       'year_title': '2025-2026',
+      'stage_id': 1,
       'stage': 'Primary',
       'course_title': 'Mathematics',
       'day_name': 'Monday',
@@ -49,9 +51,11 @@ class MockTeacherDataSource implements TeacherDataSource {
     {
       'id': 1002,
       'class_id': 201,
+      'school_class_id': 2,
       'class_name': 'Grade 2',
       'section_title': 'A',
       'year_title': '2025-2026',
+      'stage_id': 1,
       'stage': 'Primary',
       'course_title': 'Mathematics',
       'day_name': 'Wednesday',
@@ -64,9 +68,11 @@ class MockTeacherDataSource implements TeacherDataSource {
     {
       'id': 1003,
       'class_id': 202,
+      'school_class_id': 3,
       'class_name': 'Grade 3',
       'section_title': 'B',
       'year_title': '2025-2026',
+      'stage_id': 1,
       'stage': 'Primary',
       'course_title': 'Mathematics',
       'day_name': 'Tuesday',
@@ -79,9 +85,11 @@ class MockTeacherDataSource implements TeacherDataSource {
     {
       'id': 1004,
       'class_id': 202,
+      'school_class_id': 3,
       'class_name': 'Grade 3',
       'section_title': 'B',
       'year_title': '2025-2026',
+      'stage_id': 1,
       'stage': 'Primary',
       'course_title': 'Mathematics',
       'day_name': 'Thursday',
@@ -622,6 +630,9 @@ class MockTeacherDataSource implements TeacherDataSource {
       'class_id': request.classId,
       'target_type': request.targetType.name,
       'target_id': request.targetId,
+      'target_ids': request.studentIds.isNotEmpty
+          ? request.studentIds
+          : [request.targetId],
       'target_label': _targetLabel(request),
       'class_label': _classLabel(request.classId),
       'title': request.title,
@@ -759,6 +770,9 @@ class MockTeacherDataSource implements TeacherDataSource {
     return {
       'attendancePerCourse': false,
       'canTakeAttendance': true,
+      'defaultClassId': 2,
+      'defaultSectionId': 201,
+      'defaultCourseId': null,
       'classes': [
         {
           'id': 2,
@@ -1092,18 +1106,25 @@ class MockTeacherDataSource implements TeacherDataSource {
   @override
   Future<void> createActivity(UpsertActivityRequest request) async {
     await _pause();
+    final scopeLabel = switch (request.scopeType) {
+      ActivityScopeType.sectionCourse =>
+        'Section ${request.classId} · Assignment ${request.assignmentId}',
+      ActivityScopeType.section => 'Section ${request.classId}',
+      ActivityScopeType.schoolClass => 'Class ${request.schoolClassId}',
+      ActivityScopeType.stage => 'Stage ${request.stageTitle ?? request.stageId}',
+    };
     _activities.insert(0, {
       'id': 9100 + _activities.length + 1,
-      'assignmentId': request.assignmentId,
-      'classId': request.classId,
+      'assignmentId': request.assignmentId ?? 0,
+      'classId': request.classId ?? 0,
       'title': request.title,
       'content': request.content,
       'date':
           '${request.date.year.toString().padLeft(4, '0')}-${request.date.month.toString().padLeft(2, '0')}-${request.date.day.toString().padLeft(2, '0')}',
       'image': request.image ?? '',
       'isGlobal': false,
-      'scopeLabel': 'Class ${request.classId}',
-      'classLabel': 'Class ${request.classId}',
+      'scopeLabel': scopeLabel,
+      'classLabel': scopeLabel,
       'courseTitle': null,
       'isOwn': true,
     });
@@ -1268,6 +1289,9 @@ class MockTeacherDataSource implements TeacherDataSource {
       'class_id': request.classId,
       'target_type': request.targetType.name,
       'target_id': request.targetId,
+      'target_ids': request.studentIds.isNotEmpty
+          ? request.studentIds
+          : [request.targetId],
       'target_label': _targetLabel(request),
       'class_label': _classLabel(request.classId),
       'title': request.title,
@@ -1310,11 +1334,15 @@ class MockTeacherDataSource implements TeacherDataSource {
       throw const UnauthorizedTeacherActionException();
     }
     if (request.targetType == NoticeTargetType.student) {
-      final studentExists = (_studentsByClass[request.classId] ?? const []).any(
-        (student) => student['id'] == request.targetId,
-      );
-      if (!studentExists) {
-        throw const UnauthorizedTeacherActionException();
+      final ids = request.studentIds.isNotEmpty
+          ? request.studentIds
+          : [request.targetId];
+      final students = _studentsByClass[request.classId] ?? const [];
+      for (final id in ids) {
+        final studentExists = students.any((student) => student['id'] == id);
+        if (!studentExists) {
+          throw const UnauthorizedTeacherActionException();
+        }
       }
     }
   }
@@ -1350,10 +1378,23 @@ class MockTeacherDataSource implements TeacherDataSource {
       );
       return 'Section ${classData['section_title']}';
     }
-    final student = (_studentsByClass[request.classId] ?? const []).firstWhere(
-      (item) => item['id'] == request.targetId,
-    );
-    return student['full_name'] as String;
+    final ids = request.studentIds.isNotEmpty
+        ? request.studentIds
+        : [request.targetId];
+    final students = _studentsByClass[request.classId] ?? const [];
+    final names = ids
+        .map(
+          (id) => students.firstWhere((item) => item['id'] == id)['full_name']
+              as String,
+        )
+        .toList(growable: false);
+    if (names.isEmpty) {
+      return '';
+    }
+    if (names.length == 1) {
+      return names.first;
+    }
+    return '${names.first} +${names.length - 1}';
   }
 
   Map<String, dynamic> _scheduleForClass(int classId) {

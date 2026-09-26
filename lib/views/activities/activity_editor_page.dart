@@ -5,6 +5,7 @@ import 'package:my_school_teacher/controllers/activity_composer_controller.dart'
 import 'package:my_school_teacher/core/extensions/context_x.dart';
 import 'package:my_school_teacher/core/widgets/controller_consumer.dart';
 import 'package:my_school_teacher/models/request_models.dart';
+import 'package:my_school_teacher/models/teacher_assignment.dart';
 import 'package:my_school_teacher/views/widgets/app_select_field.dart';
 import 'package:my_school_teacher/views/widgets/brand_app_bar.dart';
 import 'package:my_school_teacher/views/widgets/state_views.dart';
@@ -22,7 +23,11 @@ class _ActivityEditorPageState extends State<ActivityEditorPage> {
   final _contentController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   DateTime _selectedDate = DateTime.now();
+  ActivityScopeType _scopeType = ActivityScopeType.sectionCourse;
   int? _selectedAssignmentId;
+  int? _selectedSectionId;
+  int? _selectedSchoolClassId;
+  String? _selectedStageTitle;
   String? _imageName;
   String? _imageUrl;
   bool _uploadingImage = false;
@@ -68,7 +73,7 @@ class _ActivityEditorPageState extends State<ActivityEditorPage> {
               message: context.l10n.noClassesAvailable,
             );
           }
-          _selectedAssignmentId ??= assignments.first.id;
+          _ensureScopeDefaults(assignments);
           final submitting =
               state.status == ActivityComposerStatus.submitting;
           final busy = submitting || _uploadingImage;
@@ -81,23 +86,41 @@ class _ActivityEditorPageState extends State<ActivityEditorPage> {
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                     children: [
-                      AppSelectField<int>(
-                        key: const Key('activity_assignment'),
-                        label: context.l10n.assignment,
-                        value: _selectedAssignmentId,
+                      AppSelectField<ActivityScopeType>(
+                        key: const Key('activity_scope'),
+                        label: context.l10n.activityScope,
+                        value: _scopeType,
                         enabled: !busy,
                         options: [
-                          for (final assignment in assignments)
-                            AppSelectOption(
-                              value: assignment.id,
-                              label:
-                                  '${assignment.classLabel} · ${assignment.courseTitle}',
-                            ),
+                          AppSelectOption(
+                            value: ActivityScopeType.sectionCourse,
+                            label: context.l10n.activityScopeSectionCourse,
+                          ),
+                          AppSelectOption(
+                            value: ActivityScopeType.section,
+                            label: context.l10n.activityScopeSection,
+                          ),
+                          AppSelectOption(
+                            value: ActivityScopeType.schoolClass,
+                            label: context.l10n.activityScopeClass,
+                          ),
+                          AppSelectOption(
+                            value: ActivityScopeType.stage,
+                            label: context.l10n.activityScopeStage,
+                          ),
                         ],
-                        onChanged: (value) => setState(
-                          () => _selectedAssignmentId = value,
-                        ),
+                        onChanged: (value) {
+                          if (value == null) {
+                            return;
+                          }
+                          setState(() {
+                            _scopeType = value;
+                            _ensureScopeDefaults(assignments);
+                          });
+                        },
                       ),
+                      const SizedBox(height: 8),
+                      ..._scopeTargetFields(assignments, busy),
                       const SizedBox(height: 8),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
@@ -191,7 +214,7 @@ class _ActivityEditorPageState extends State<ActivityEditorPage> {
                       child: SizedBox(
                         width: double.infinity,
                         child: FilledButton(
-                          onPressed: busy ? null : _submit,
+                          onPressed: busy ? null : () => _submit(assignments),
                           child: submitting
                               ? const SizedBox.square(
                                   dimension: 22,
@@ -211,6 +234,154 @@ class _ActivityEditorPageState extends State<ActivityEditorPage> {
         },
       ),
     );
+  }
+
+  List<Widget> _scopeTargetFields(
+    List<TeacherAssignment> assignments,
+    bool busy,
+  ) {
+    switch (_scopeType) {
+      case ActivityScopeType.sectionCourse:
+        return [
+          AppSelectField<int>(
+            key: const Key('activity_assignment'),
+            label: context.l10n.assignment,
+            value: _selectedAssignmentId,
+            enabled: !busy,
+            options: [
+              for (final assignment in assignments)
+                AppSelectOption(
+                  value: assignment.id,
+                  label:
+                      '${assignment.classLabel} · ${assignment.courseTitle}',
+                ),
+            ],
+            onChanged: (value) => setState(() => _selectedAssignmentId = value),
+          ),
+        ];
+      case ActivityScopeType.section:
+        final sections = _uniqueBy(
+          assignments,
+          (item) => item.classId,
+        );
+        return [
+          AppSelectField<int>(
+            key: const Key('activity_section'),
+            label: context.l10n.selectSection,
+            value: _selectedSectionId,
+            enabled: !busy,
+            options: [
+              for (final assignment in sections)
+                AppSelectOption(
+                  value: assignment.classId,
+                  label: assignment.classLabel,
+                ),
+            ],
+            onChanged: (value) => setState(() => _selectedSectionId = value),
+          ),
+        ];
+      case ActivityScopeType.schoolClass:
+        final classes = _uniqueBy(
+          assignments,
+          (item) => item.schoolClassId,
+        );
+        return [
+          AppSelectField<int>(
+            key: const Key('activity_class'),
+            label: context.l10n.selectClass,
+            value: _selectedSchoolClassId,
+            enabled: !busy,
+            options: [
+              for (final assignment in classes)
+                AppSelectOption(
+                  value: assignment.schoolClassId,
+                  label: assignment.className,
+                ),
+            ],
+            onChanged: (value) =>
+                setState(() => _selectedSchoolClassId = value),
+          ),
+        ];
+      case ActivityScopeType.stage:
+        final stages = _uniqueStages(assignments);
+        return [
+          AppSelectField<String>(
+            key: const Key('activity_stage'),
+            label: context.l10n.selectStage,
+            value: _selectedStageTitle,
+            enabled: !busy,
+            options: [
+              for (final stage in stages)
+                AppSelectOption(
+                  value: stage,
+                  label: stage,
+                ),
+            ],
+            onChanged: (value) => setState(() => _selectedStageTitle = value),
+          ),
+        ];
+    }
+  }
+
+  void _ensureScopeDefaults(List<TeacherAssignment> assignments) {
+    _selectedAssignmentId ??= assignments.first.id;
+    _selectedSectionId ??= assignments.first.classId;
+    _selectedSchoolClassId ??= assignments.first.schoolClassId;
+    final stageOptions = _uniqueStages(assignments);
+    _selectedStageTitle ??=
+        stageOptions.isEmpty ? null : stageOptions.first;
+
+    if (_scopeType == ActivityScopeType.sectionCourse &&
+        !assignments.any((item) => item.id == _selectedAssignmentId)) {
+      _selectedAssignmentId = assignments.first.id;
+    }
+    if (_scopeType == ActivityScopeType.section &&
+        !assignments.any((item) => item.classId == _selectedSectionId)) {
+      _selectedSectionId = assignments.first.classId;
+    }
+    if (_scopeType == ActivityScopeType.schoolClass &&
+        !assignments.any(
+          (item) => item.schoolClassId == _selectedSchoolClassId,
+        )) {
+      _selectedSchoolClassId = assignments.first.schoolClassId;
+    }
+    if (_scopeType == ActivityScopeType.stage) {
+      if (_selectedStageTitle == null ||
+          !stageOptions.contains(_selectedStageTitle)) {
+        _selectedStageTitle =
+            stageOptions.isEmpty ? null : stageOptions.first;
+      }
+    }
+  }
+
+  List<String> _uniqueStages(List<TeacherAssignment> assignments) {
+    final seen = <String>{};
+    final result = <String>[];
+    for (final item in assignments) {
+      final title = item.stage.trim();
+      if (title.isEmpty) {
+        continue;
+      }
+      if (seen.add(title)) {
+        result.add(title);
+      }
+    }
+    return result;
+  }
+
+  List<TeacherAssignment> _uniqueBy(
+    Iterable<TeacherAssignment> items,
+    int Function(TeacherAssignment) keyOf,
+  ) {
+    final seen = <int>{};
+    final result = <TeacherAssignment>[];
+    for (final item in items) {
+      final key = keyOf(item);
+      if (seen.add(key)) {
+        result.add(item);
+      }
+    }
+    return result;
   }
 
   Future<void> _pickDate() async {
@@ -269,25 +440,77 @@ class _ActivityEditorPageState extends State<ActivityEditorPage> {
     }
   }
 
-  void _submit() {
-    if (!_formKey.currentState!.validate() || _selectedAssignmentId == null) {
+  void _submit(List<TeacherAssignment> assignments) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
-    final assignment = context
-        .read<ActivityComposerController>()
-        .state
-        .assignments
-        .firstWhere((item) => item.id == _selectedAssignmentId);
-    context.read<ActivityComposerController>().create(
-      UpsertActivityRequest(
-        assignmentId: assignment.id,
-        classId: assignment.classId,
-        title: _titleController.text.trim(),
-        content: _contentController.text.trim(),
-        date: _selectedDate,
-        image: _imageUrl,
-      ),
-    );
+
+    final UpsertActivityRequest? request = switch (_scopeType) {
+      ActivityScopeType.sectionCourse => () {
+        if (_selectedAssignmentId == null) {
+          return null;
+        }
+        final assignment = assignments.firstWhere(
+          (item) => item.id == _selectedAssignmentId,
+        );
+        return UpsertActivityRequest(
+          scopeType: ActivityScopeType.sectionCourse,
+          assignmentId: assignment.id,
+          classId: assignment.classId,
+          title: _titleController.text.trim(),
+          content: _contentController.text.trim(),
+          date: _selectedDate,
+          image: _imageUrl,
+        );
+      }(),
+      ActivityScopeType.section => _selectedSectionId == null
+          ? null
+          : UpsertActivityRequest(
+              scopeType: ActivityScopeType.section,
+              classId: _selectedSectionId,
+              title: _titleController.text.trim(),
+              content: _contentController.text.trim(),
+              date: _selectedDate,
+              image: _imageUrl,
+            ),
+      ActivityScopeType.schoolClass => _selectedSchoolClassId == null
+          ? null
+          : UpsertActivityRequest(
+              scopeType: ActivityScopeType.schoolClass,
+              schoolClassId: _selectedSchoolClassId,
+              title: _titleController.text.trim(),
+              content: _contentController.text.trim(),
+              date: _selectedDate,
+              image: _imageUrl,
+            ),
+      ActivityScopeType.stage => () {
+        final title = _selectedStageTitle?.trim();
+        if (title == null || title.isEmpty) {
+          return null;
+        }
+        TeacherAssignment? match;
+        for (final item in assignments) {
+          if (item.stage.trim() == title) {
+            match = item;
+            break;
+          }
+        }
+        return UpsertActivityRequest(
+          scopeType: ActivityScopeType.stage,
+          stageId: match != null && match.stageId > 0 ? match.stageId : null,
+          stageTitle: title,
+          title: _titleController.text.trim(),
+          content: _contentController.text.trim(),
+          date: _selectedDate,
+          image: _imageUrl,
+        );
+      }(),
+    };
+
+    if (request == null) {
+      return;
+    }
+    context.read<ActivityComposerController>().create(request);
   }
 }
 

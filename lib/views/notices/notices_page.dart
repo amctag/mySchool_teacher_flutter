@@ -116,7 +116,9 @@ class _NoticeCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          notice.title,
+                          notice.targetLabel.isNotEmpty
+                              ? notice.targetLabel
+                              : notice.classLabel,
                           style: context.textStyles.titleMedium,
                         ),
                         const SizedBox(height: 4),
@@ -140,13 +142,16 @@ class _NoticeCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              Text(
-                '${notice.classLabel} · ${notice.targetLabel}',
-                style: context.textStyles.bodySmall?.copyWith(
-                  color: context.colors.onSurfaceVariant,
+              if (notice.classLabel.isNotEmpty &&
+                  notice.targetLabel.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text(
+                  notice.classLabel,
+                  style: context.textStyles.bodySmall?.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
                 ),
-              ),
+              ],
               const SizedBox(height: 8),
               Text(notice.content, style: context.textStyles.bodyMedium),
             ],

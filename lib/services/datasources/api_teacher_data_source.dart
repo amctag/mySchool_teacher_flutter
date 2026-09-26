@@ -526,9 +526,15 @@ class ApiTeacherDataSource implements TeacherDataSource {
     return {
       'id': json['id'],
       'class_id': json['classId'] ?? json['class_id'],
+      'school_class_id':
+          json['schoolClassId'] ??
+          json['school_class_id'] ??
+          json['classId'] ??
+          json['class_id'],
       'class_name': json['className'] ?? json['class_name'] ?? '',
       'section_title': json['sectionTitle'] ?? json['section_title'] ?? '',
       'year_title': json['yearTitle'] ?? json['year_title'] ?? '',
+      'stage_id': json['stageId'] ?? json['stage_id'] ?? 0,
       'stage': json['stage'] ?? '',
       'course_title': json['courseTitle'] ?? json['course_title'] ?? '',
       'day_name': json['dayName'] ?? json['day_name'] ?? '',
@@ -599,8 +605,14 @@ class ApiTeacherDataSource implements TeacherDataSource {
 
   Map<String, dynamic> _activityBody(UpsertActivityRequest request) {
     return {
-      'assignmentId': request.assignmentId,
-      'classId': request.classId,
+      'scopeType': request.scopeType.apiValue,
+      if (request.assignmentId != null) 'assignmentId': request.assignmentId,
+      if (request.classId != null) 'classId': request.classId,
+      if (request.schoolClassId != null) 'schoolClassId': request.schoolClassId,
+      if (request.stageId != null && request.stageId! > 0)
+        'stageId': request.stageId,
+      if (request.stageTitle != null && request.stageTitle!.trim().isNotEmpty)
+        'stageTitle': request.stageTitle!.trim(),
       'title': request.title,
       'content': request.content,
       'date': _dateOnly(request.date),
@@ -649,6 +661,7 @@ class ApiTeacherDataSource implements TeacherDataSource {
       'class_id': json['classId'] ?? json['class_id'],
       'target_type': json['targetType'] ?? json['target_type'],
       'target_id': json['targetId'] ?? json['target_id'],
+      'target_ids': json['targetIds'] ?? json['target_ids'] ?? const [],
       'target_label': json['targetLabel'] ?? json['target_label'] ?? '',
       'class_label': json['classLabel'] ?? json['class_label'] ?? '',
       'title': json['title'] ?? 'Notice',
@@ -663,6 +676,7 @@ class ApiTeacherDataSource implements TeacherDataSource {
       'classId': request.classId,
       'targetType': request.targetType.name,
       'targetId': request.targetId,
+      if (request.studentIds.isNotEmpty) 'studentIds': request.studentIds,
       'title': request.title,
       'content': request.content,
       'publishDate': request.publishDate.toIso8601String().substring(0, 10),

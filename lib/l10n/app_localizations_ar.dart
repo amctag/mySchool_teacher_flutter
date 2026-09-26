@@ -172,7 +172,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get announcements => 'إشعار';
+  String get announcements => 'إشعارات';
 
   @override
   String get announcementDetails => 'تفاصيل الإشعار';
@@ -355,10 +355,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get draft => 'مسودة';
 
   @override
-  String get saved => 'محفوظ';
+  String get saved => 'Saved';
 
   @override
-  String get saveAsDraft => 'حفظ كمسودة';
+  String get saveAsDraft => 'Save as draft';
 
   @override
   String get you => 'أنت';
@@ -733,7 +733,12 @@ class AppLocalizationsAr extends AppLocalizations {
       'اختر الصف والشعبة والمادة ثم اضغط تحميل.';
 
   @override
-  String get selectStudent => 'اختر الطالب';
+  String get selectStudent => 'اختر الطلاب';
+
+  @override
+  String studentsSelectedCount(int count) {
+    return '$count محددون';
+  }
 
   @override
   String get sendToEntireClass => 'الصف بالكامل';
@@ -770,4 +775,22 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get departmentLabel => 'القسم';
+
+  @override
+  String get activityScope => 'الجمهور';
+
+  @override
+  String get activityScopeSectionCourse => 'شعبة ومادة';
+
+  @override
+  String get activityScopeSection => 'شعبة';
+
+  @override
+  String get activityScopeClass => 'صف';
+
+  @override
+  String get activityScopeStage => 'مرحلة';
+
+  @override
+  String get selectStage => 'اختر المرحلة';
 }

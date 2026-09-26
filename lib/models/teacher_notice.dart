@@ -17,6 +17,7 @@ class TeacherNotice extends Equatable {
     required this.classId,
     required this.targetType,
     required this.targetId,
+    this.targetIds = const [],
     required this.targetLabel,
     required this.classLabel,
     required this.title,
@@ -26,6 +27,11 @@ class TeacherNotice extends Equatable {
   });
 
   factory TeacherNotice.fromJson(Map<String, dynamic> json) {
+    final rawIds = json['target_ids'] ?? json['targetIds'];
+    final parsedIds = rawIds is List
+        ? rawIds.map((item) => item as int).toList(growable: false)
+        : const <int>[];
+    final targetId = (json['target_id'] ?? json['targetId']) as int;
     return TeacherNotice(
       id: json['id'] as int,
       assignmentId: (json['assignment_id'] ?? json['assignmentId']) as int?,
@@ -33,7 +39,8 @@ class TeacherNotice extends Equatable {
       targetType: noticeTargetTypeFromJson(
         (json['target_type'] ?? json['targetType'] ?? 'section') as String,
       ),
-      targetId: (json['target_id'] ?? json['targetId']) as int,
+      targetId: targetId,
+      targetIds: parsedIds.isNotEmpty ? parsedIds : [targetId],
       targetLabel: (json['target_label'] ?? json['targetLabel'] ?? '') as String,
       classLabel: (json['class_label'] ?? json['classLabel'] ?? '') as String,
       title: json['title'] as String,
@@ -50,6 +57,7 @@ class TeacherNotice extends Equatable {
   final int classId;
   final NoticeTargetType targetType;
   final int targetId;
+  final List<int> targetIds;
   final String targetLabel;
   final String classLabel;
   final String title;
@@ -64,6 +72,7 @@ class TeacherNotice extends Equatable {
     classId,
     targetType,
     targetId,
+    targetIds,
     targetLabel,
     classLabel,
     title,

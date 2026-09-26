@@ -268,7 +268,13 @@
   "filters": "Filtres",
   "loadMore": "Charger plus",
   "selectFiltersToLoadGrades": "Choisissez la classe, la section et la matière, puis appuyez sur Charger.",
-  "selectStudent": "Choisir l’élève",
+  "selectStudent": "Choisir les élèves",
+  "studentsSelectedCount": "{count} sélectionné(s)",
+  "@studentsSelectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "sendToEntireClass": "Toute la classe",
   "changeClass": "Changer de classe",
   "noStudentsInClass": "Aucun élève dans cette classe.",
@@ -280,5 +286,11 @@
   "delete": "Supprimer",
   "deleteItemQuestion": "Supprimer cet élément ?",
   "titleLabel": "Titre",
-  "departmentLabel": "Département"
+  "departmentLabel": "Département",
+  "activityScope": "Public",
+  "activityScopeSectionCourse": "Section + matière",
+  "activityScopeSection": "Section",
+  "activityScopeClass": "Classe",
+  "activityScopeStage": "Cycle",
+  "selectStage": "Choisir le cycle"
 }

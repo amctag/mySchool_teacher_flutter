@@ -753,7 +753,12 @@ class AppLocalizationsFr extends AppLocalizations {
       'Choisissez la classe, la section et la matière, puis appuyez sur Charger.';
 
   @override
-  String get selectStudent => 'Choisir l’élève';
+  String get selectStudent => 'Choisir les élèves';
+
+  @override
+  String studentsSelectedCount(int count) {
+    return '$count sélectionné(s)';
+  }
 
   @override
   String get sendToEntireClass => 'Toute la classe';
@@ -790,4 +795,22 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get departmentLabel => 'Département';
+
+  @override
+  String get activityScope => 'Public';
+
+  @override
+  String get activityScopeSectionCourse => 'Section + matière';
+
+  @override
+  String get activityScopeSection => 'Section';
+
+  @override
+  String get activityScopeClass => 'Classe';
+
+  @override
+  String get activityScopeStage => 'Cycle';
+
+  @override
+  String get selectStage => 'Choisir le cycle';
 }

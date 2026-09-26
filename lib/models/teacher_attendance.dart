@@ -116,6 +116,9 @@ class TeacherAttendanceOptions extends Equatable {
   const TeacherAttendanceOptions({
     required this.attendancePerCourse,
     this.canTakeAttendance = false,
+    this.defaultClassId,
+    this.defaultSectionId,
+    this.defaultCourseId,
     required this.classes,
     required this.reasons,
   });
@@ -130,6 +133,15 @@ class TeacherAttendanceOptions extends Equatable {
       canTakeAttendance: canTake == null
           ? attendancePerCourse
           : parseJsonBool(canTake),
+      defaultClassId: _optionalInt(
+        json['defaultClassId'] ?? json['default_class_id'],
+      ),
+      defaultSectionId: _optionalInt(
+        json['defaultSectionId'] ?? json['default_section_id'],
+      ),
+      defaultCourseId: _optionalInt(
+        json['defaultCourseId'] ?? json['default_course_id'],
+      ),
       classes: ((json['classes'] as List<dynamic>?) ?? const [])
           .map(
             (item) => AttendanceClassOption.fromJson(
@@ -147,6 +159,13 @@ class TeacherAttendanceOptions extends Equatable {
     );
   }
 
+  static int? _optionalInt(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+    return parseJsonInt(value);
+  }
+
   static const empty = TeacherAttendanceOptions(
     attendancePerCourse: false,
     canTakeAttendance: false,
@@ -156,6 +175,9 @@ class TeacherAttendanceOptions extends Equatable {
 
   final bool attendancePerCourse;
   final bool canTakeAttendance;
+  final int? defaultClassId;
+  final int? defaultSectionId;
+  final int? defaultCourseId;
   final List<AttendanceClassOption> classes;
   final List<AttendanceReasonOption> reasons;
 
@@ -163,6 +185,9 @@ class TeacherAttendanceOptions extends Equatable {
   List<Object?> get props => [
     attendancePerCourse,
     canTakeAttendance,
+    defaultClassId,
+    defaultSectionId,
+    defaultCourseId,
     classes,
     reasons,
   ];

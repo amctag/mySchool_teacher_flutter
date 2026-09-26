@@ -415,7 +415,7 @@ abstract class AppLocalizations {
   /// No description provided for @announcements.
   ///
   /// In en, this message translates to:
-  /// **'Notice'**
+  /// **'Notices'**
   String get announcements;
 
   /// No description provided for @announcementDetails.
@@ -1255,7 +1255,7 @@ abstract class AppLocalizations {
   /// No description provided for @parentsSeePublished.
   ///
   /// In en, this message translates to:
-  /// **'Parents only see published agenda items.'**
+  /// **'Drafts stay private. Saved items are visible to the school and supervisors. Parents only see published items.'**
   String get parentsSeePublished;
 
   /// No description provided for @schoolPublishesAgenda.
@@ -1471,8 +1471,14 @@ abstract class AppLocalizations {
   /// No description provided for @selectStudent.
   ///
   /// In en, this message translates to:
-  /// **'Select student'**
+  /// **'Select students'**
   String get selectStudent;
+
+  /// No description provided for @studentsSelectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String studentsSelectedCount(int count);
 
   /// No description provided for @sendToEntireClass.
   ///
@@ -1545,6 +1551,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Department'**
   String get departmentLabel;
+
+  /// No description provided for @activityScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Audience'**
+  String get activityScope;
+
+  /// No description provided for @activityScopeSectionCourse.
+  ///
+  /// In en, this message translates to:
+  /// **'Section + course'**
+  String get activityScopeSectionCourse;
+
+  /// No description provided for @activityScopeSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section'**
+  String get activityScopeSection;
+
+  /// No description provided for @activityScopeClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Class'**
+  String get activityScopeClass;
+
+  /// No description provided for @activityScopeStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage'**
+  String get activityScopeStage;
+
+  /// No description provided for @selectStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select stage'**
+  String get selectStage;
 }
 
 class _AppLocalizationsDelegate

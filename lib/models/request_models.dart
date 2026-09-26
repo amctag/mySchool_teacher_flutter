@@ -146,16 +146,24 @@ class SaveTeacherAttendanceRequest extends Equatable {
 
 class UpsertActivityRequest extends Equatable {
   const UpsertActivityRequest({
-    required this.assignmentId,
-    required this.classId,
+    required this.scopeType,
+    this.assignmentId,
+    this.classId,
+    this.schoolClassId,
+    this.stageId,
+    this.stageTitle,
     required this.title,
     required this.content,
     required this.date,
     this.image,
   });
 
-  final int assignmentId;
-  final int classId;
+  final ActivityScopeType scopeType;
+  final int? assignmentId;
+  final int? classId;
+  final int? schoolClassId;
+  final int? stageId;
+  final String? stageTitle;
   final String title;
   final String content;
   final DateTime date;
@@ -163,8 +171,12 @@ class UpsertActivityRequest extends Equatable {
 
   @override
   List<Object?> get props => [
+    scopeType,
     assignmentId,
     classId,
+    schoolClassId,
+    stageId,
+    stageTitle,
     title,
     content,
     date,
@@ -172,11 +184,28 @@ class UpsertActivityRequest extends Equatable {
   ];
 }
 
+enum ActivityScopeType {
+  sectionCourse,
+  section,
+  schoolClass,
+  stage,
+}
+
+extension ActivityScopeTypeApi on ActivityScopeType {
+  String get apiValue => switch (this) {
+    ActivityScopeType.sectionCourse => 'section_course',
+    ActivityScopeType.section => 'section',
+    ActivityScopeType.schoolClass => 'class',
+    ActivityScopeType.stage => 'stage',
+  };
+}
+
 class UpsertNoticeRequest extends Equatable {
   const UpsertNoticeRequest({
     required this.classId,
     required this.targetType,
     required this.targetId,
+    this.studentIds = const [],
     required this.title,
     required this.content,
     required this.publishDate,
@@ -186,6 +215,7 @@ class UpsertNoticeRequest extends Equatable {
   final int classId;
   final NoticeTargetType targetType;
   final int targetId;
+  final List<int> studentIds;
   final String title;
   final String content;
   final DateTime publishDate;
@@ -195,6 +225,7 @@ class UpsertNoticeRequest extends Equatable {
     'class_id': classId,
     'target_type': targetType.name,
     'target_id': targetId,
+    if (studentIds.isNotEmpty) 'student_ids': studentIds,
     'title': title,
     'content': content,
     'publish_date': publishDate.toIso8601String(),
@@ -206,6 +237,7 @@ class UpsertNoticeRequest extends Equatable {
     classId,
     targetType,
     targetId,
+    studentIds,
     title,
     content,
     publishDate,

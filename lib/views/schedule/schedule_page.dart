@@ -73,64 +73,69 @@ class _ScheduleTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const cellWidth = 88.0;
+    const periodWidth = 36.0;
+    const cellWidth = 92.0;
     final orderedDays = _orderedDays();
+    final periodCount = _maxPeriods(schedule);
+    final borderColor = context.colors.outlineVariant;
     final headingStyle = context.textStyles.labelSmall?.copyWith(
       fontWeight: FontWeight.w700,
     );
+    final headerBg = context.colors.primaryContainer;
+
+    TableRow headerRow() {
+      return TableRow(
+        decoration: BoxDecoration(color: headerBg),
+        children: [
+          _HeaderCell(
+            width: periodWidth,
+            child: Text('*', textAlign: TextAlign.center, style: headingStyle),
+          ),
+          for (final day in orderedDays)
+            _HeaderCell(
+              width: cellWidth,
+              child: Text(
+                _shortDayName(day.dayName),
+                textAlign: TextAlign.center,
+                style: headingStyle,
+              ),
+            ),
+        ],
+      );
+    }
+
     return Scrollbar(
       child: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 4),
         scrollDirection: Axis.horizontal,
         child: Card(
           clipBehavior: Clip.antiAlias,
-          child: DataTable(
-            headingRowColor: WidgetStatePropertyAll(
-              context.colors.primaryContainer,
-            ),
-            headingRowHeight: 36,
-            columnSpacing: 4,
-            horizontalMargin: 8,
-            dataRowMinHeight: 44,
-            dataRowMaxHeight: 56,
-            columns: [
-              DataColumn(
-                label: SizedBox(
-                  width: 40,
-                  child: Text(context.l10n.period, style: headingStyle),
-                ),
-              ),
-              for (final day in orderedDays)
-                DataColumn(
-                  label: SizedBox(
-                    width: cellWidth,
-                    child: Text(
-                      _shortDayName(day.dayName),
-                      textAlign: TextAlign.center,
-                      style: headingStyle,
-                    ),
-                  ),
-                ),
-            ],
-            rows: [
-              for (var index = 0; index < _maxPeriods(schedule); index++)
-                DataRow(
-                  cells: [
-                    DataCell(
-                      Text(
+          child: Table(
+            border: TableBorder.all(color: borderColor, width: 1),
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            columnWidths: {
+              0: const FixedColumnWidth(periodWidth),
+              for (var i = 0; i < orderedDays.length; i++)
+                i + 1: const FixedColumnWidth(cellWidth),
+            },
+            children: [
+              headerRow(),
+              for (var index = 0; index < periodCount; index++)
+                TableRow(
+                  children: [
+                    _BodyCell(
+                      child: Text(
                         '${index + 1}',
+                        textAlign: TextAlign.center,
                         style: context.textStyles.labelLarge?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
                     for (final day in orderedDays)
-                      DataCell(
-                        SizedBox(
-                          width: cellWidth,
-                          child: _PeriodCell(
-                            entries: _entriesAtPosition(day, index + 1),
-                          ),
+                      _BodyCell(
+                        child: _PeriodCell(
+                          entries: _entriesAtPosition(day, index + 1),
                         ),
                       ),
                   ],
@@ -178,6 +183,38 @@ class _ScheduleTable extends StatelessWidget {
   }
 }
 
+class _HeaderCell extends StatelessWidget {
+  const _HeaderCell({required this.width, required this.child});
+
+  final double width;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _BodyCell extends StatelessWidget {
+  const _BodyCell({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      child: child,
+    );
+  }
+}
+
 String _shortDayName(String dayName) {
   final trimmed = dayName.trim();
   if (trimmed.length <= 3) {
@@ -203,7 +240,7 @@ class _PeriodCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (entries.isEmpty) {
-      return const SizedBox.shrink();
+      return const SizedBox(height: 36);
     }
 
     return Column(

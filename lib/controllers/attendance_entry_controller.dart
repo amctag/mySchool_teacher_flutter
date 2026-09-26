@@ -152,6 +152,8 @@ class AttendanceEntryController extends NotifierController<AttendanceEntryState>
         return;
       }
       int? classId;
+      int? sectionId = item?.sectionId;
+      int? courseId = item?.courseId;
       if (item != null) {
         for (final classItem in options.classes) {
           if (classItem.sections.any((section) => section.id == item.sectionId)) {
@@ -159,6 +161,10 @@ class AttendanceEntryController extends NotifierController<AttendanceEntryState>
             break;
           }
         }
+      } else if (options.defaultSectionId != null) {
+        classId = options.defaultClassId;
+        sectionId = options.defaultSectionId;
+        courseId = options.defaultCourseId;
       }
       emit(
         AttendanceEntryState(
@@ -166,11 +172,11 @@ class AttendanceEntryController extends NotifierController<AttendanceEntryState>
           options: options,
           date: selectedDate,
           selectedClassId: classId,
-          selectedSectionId: item?.sectionId,
-          selectedCourseId: item?.courseId,
+          selectedSectionId: sectionId,
+          selectedCourseId: courseId,
         ),
       );
-      if (item != null) {
+      if (item != null || sectionId != null) {
         await loadSheet();
       }
     } catch (error) {
@@ -247,10 +253,20 @@ class AttendanceEntryController extends NotifierController<AttendanceEntryState>
     );
     try {
       final options = await _repository.attendanceOptions(date: selectedDate);
+      final useDefault =
+          !options.attendancePerCourse && options.defaultSectionId != null;
       emit(
         state.copyWith(
           status: AttendanceEntryStatus.ready,
           options: options,
+          selectedClassId: useDefault
+              ? options.defaultClassId
+              : state.selectedClassId,
+          selectedSectionId: useDefault
+              ? options.defaultSectionId
+              : state.selectedSectionId,
+          selectedCourseId: useDefault ? null : state.selectedCourseId,
+          clearCourse: useDefault,
         ),
       );
       if (state.canLoadStudents) {

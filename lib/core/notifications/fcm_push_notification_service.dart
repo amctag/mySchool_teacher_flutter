@@ -233,6 +233,9 @@ class FcmPushNotificationService implements PushNotificationService {
     }
     try {
       if (kIsWeb) {
+        if (TeacherFirebaseWeb.vapidKey.isEmpty) {
+          throw StateError(TeacherFirebaseWeb.vapidConfigError);
+        }
         final supported = await FirebaseMessaging.instance.isSupported();
         if (!supported) {
           throw StateError(

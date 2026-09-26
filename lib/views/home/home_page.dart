@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:my_school_teacher/core/notifications/firebase_web_config.dart';
 import 'package:my_school_teacher/core/notifications/push_notification_service.dart';
 import 'package:my_school_teacher/services/repositories/teacher_repository.dart';
 import 'package:my_school_teacher/controllers/notifications_controller.dart';
@@ -227,6 +228,13 @@ class _WebNotificationBannerState extends State<_WebNotificationBanner> {
       _busy = prompt;
       _error = null;
     });
+    if (kIsWeb && TeacherFirebaseWeb.vapidKey.isEmpty) {
+      setState(() {
+        _busy = false;
+        _error = TeacherFirebaseWeb.vapidConfigError;
+      });
+      return;
+    }
     try {
       final token = await context.read<PushNotificationService>().getToken(
         prompt: prompt,

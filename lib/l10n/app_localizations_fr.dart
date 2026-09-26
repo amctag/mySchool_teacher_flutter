@@ -371,6 +371,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get draft => 'Brouillon';
 
   @override
+  String get saved => 'Enregistré';
+
+  @override
+  String get saveAsDraft => 'Enregistrer comme brouillon';
+
+  @override
   String get you => 'Vous';
 
   @override
@@ -632,7 +638,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get parentsSeePublished =>
-      'Les parents ne voient que les agendas publiés.';
+      'Les brouillons restent privés. Les agendas enregistrés sont visibles par l\'école et les superviseurs. Les parents ne voient que les agendas publiés.';
 
   @override
   String get schoolPublishesAgenda =>

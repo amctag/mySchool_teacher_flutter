@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+enum AgendaPublishStatus { draft, saved, published }
+
 class TeacherAgendaItem extends Equatable {
   const TeacherAgendaItem({
     required this.id,
@@ -14,7 +16,7 @@ class TeacherAgendaItem extends Equatable {
     required this.time,
     this.imageLink,
     this.fileLink,
-    this.published = false,
+    this.status = AgendaPublishStatus.draft,
     this.isOwn = true,
     this.canPublish = true,
   });
@@ -41,7 +43,7 @@ class TeacherAgendaItem extends Equatable {
             json['attachment_url'] ??
             json['attachmentUrl'],
       ),
-      published: json['published'] == true || json['status'] == 1,
+      status: _parseStatus(json),
       isOwn: json['is_own'] == true ||
           json['isOwn'] == true ||
           (json['is_own'] == null && json['isOwn'] == null),
@@ -62,11 +64,25 @@ class TeacherAgendaItem extends Equatable {
   final String time;
   final String? imageLink;
   final String? fileLink;
-  final bool published;
+  final AgendaPublishStatus status;
   final bool isOwn;
   final bool canPublish;
 
-  TeacherAgendaItem copyWith({bool? published, bool? canPublish}) {
+  bool get published => status == AgendaPublishStatus.published;
+  bool get isDraft => status == AgendaPublishStatus.draft;
+  bool get isSaved => status == AgendaPublishStatus.saved;
+
+  TeacherAgendaItem copyWith({
+    AgendaPublishStatus? status,
+    bool? published,
+    bool? canPublish,
+  }) {
+    var nextStatus = status ?? this.status;
+    if (published == true) {
+      nextStatus = AgendaPublishStatus.published;
+    } else if (published == false && status == null) {
+      nextStatus = AgendaPublishStatus.saved;
+    }
     return TeacherAgendaItem(
       id: id,
       assignmentId: assignmentId,
@@ -80,10 +96,31 @@ class TeacherAgendaItem extends Equatable {
       time: time,
       imageLink: imageLink,
       fileLink: fileLink,
-      published: published ?? this.published,
+      status: nextStatus,
       isOwn: isOwn,
       canPublish: canPublish ?? this.canPublish,
     );
+  }
+
+  static AgendaPublishStatus _parseStatus(Map<String, dynamic> json) {
+    final raw = json['status'];
+    if (raw is String) {
+      switch (raw.toLowerCase()) {
+        case 'published':
+          return AgendaPublishStatus.published;
+        case 'saved':
+          return AgendaPublishStatus.saved;
+        case 'draft':
+          return AgendaPublishStatus.draft;
+      }
+    }
+    if (raw == 1 || json['published'] == true) {
+      return AgendaPublishStatus.published;
+    }
+    if (raw == 2) {
+      return AgendaPublishStatus.saved;
+    }
+    return AgendaPublishStatus.draft;
   }
 
   static String? _optionalLink(dynamic value) {
@@ -108,7 +145,7 @@ class TeacherAgendaItem extends Equatable {
     time,
     imageLink,
     fileLink,
-    published,
+    status,
     isOwn,
     canPublish,
   ];

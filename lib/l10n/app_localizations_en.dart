@@ -365,6 +365,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get draft => 'Draft';
 
   @override
+  String get saved => 'Saved';
+
+  @override
+  String get saveAsDraft => 'Save as draft';
+
+  @override
   String get you => 'You';
 
   @override
@@ -624,7 +630,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get optional => 'Optional';
 
   @override
-  String get parentsSeePublished => 'Parents only see published agenda items.';
+  String get parentsSeePublished =>
+      'Drafts stay private. Saved items are visible to the school and supervisors. Parents only see published items.';
 
   @override
   String get schoolPublishesAgenda =>

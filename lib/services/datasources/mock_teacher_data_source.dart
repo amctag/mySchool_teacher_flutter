@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:my_school_teacher/services/datasources/teacher_data_source.dart';
 import 'package:my_school_teacher/models/request_models.dart';
+import 'package:my_school_teacher/models/teacher_agenda_item.dart';
 import 'package:my_school_teacher/models/teacher_notice.dart';
 import 'package:my_school_teacher/services/network/teacher_api_client.dart';
 
@@ -512,6 +513,14 @@ class MockTeacherDataSource implements TeacherDataSource {
   Future<void> createAgenda(UpsertAgendaRequest request) async {
     await _pause();
     _assertAssignment(request.assignmentId, request.classId);
+    final canPublish =
+        request.status == AgendaPublishStatus.published &&
+        teachersCanPublishAgenda;
+    final status = canPublish
+        ? AgendaPublishStatus.published
+        : request.status == AgendaPublishStatus.published
+            ? AgendaPublishStatus.saved
+            : request.status;
     _agendaItems.insert(0, {
       'id': _nextId(_agendaItems),
       'assignment_id': request.assignmentId,
@@ -525,7 +534,8 @@ class MockTeacherDataSource implements TeacherDataSource {
       'time': '08:00',
       'image_link': request.imageLink,
       'file_link': request.fileLink,
-      'published': request.published && teachersCanPublishAgenda,
+      'status': status.name,
+      'published': canPublish,
     });
   }
 
@@ -542,6 +552,7 @@ class MockTeacherDataSource implements TeacherDataSource {
     _agendaItems[index] = {
       ..._agendaItems[index],
       'published': true,
+      'status': 'published',
       'publish_date': _dateOnly(DateTime.now()),
     };
   }
@@ -1238,7 +1249,8 @@ class MockTeacherDataSource implements TeacherDataSource {
       'date': _dateOnly(request.date),
       'image_link': request.imageLink,
       'file_link': request.fileLink,
-      if (request.published) 'published': true,
+      'status': request.status.name,
+      'published': request.published,
     };
   }
 

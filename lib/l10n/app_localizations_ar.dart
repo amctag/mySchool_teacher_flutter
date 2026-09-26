@@ -355,6 +355,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get draft => 'مسودة';
 
   @override
+  String get saved => 'محفوظ';
+
+  @override
+  String get saveAsDraft => 'حفظ كمسودة';
+
+  @override
   String get you => 'أنت';
 
   @override
@@ -615,7 +621,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get parentsSeePublished =>
-      'يرى أولياء الأمور عناصر المفكرة المنشورة فقط.';
+      'المسودات خاصة بك فقط. العناصر المحفوظة تظهر للمدرسة والمشرفين. أولياء الأمور يرون العناصر المنشورة فقط.';
 
   @override
   String get schoolPublishesAgenda =>

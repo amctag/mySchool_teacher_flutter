@@ -575,7 +575,9 @@ class ApiTeacherDataSource implements TeacherDataSource {
           json['file_link'] ??
           json['attachmentUrl'] ??
           json['attachment_url'],
-      'published': json['published'] ?? json['status'] == 1,
+      'published': json['published'] ?? json['status'] == 1 || json['status'] == 'published',
+      'status': json['status'] ??
+          (json['published'] == true ? 'published' : 'draft'),
       'is_own': json['isOwn'] ?? json['is_own'] ?? true,
       'can_publish': json['canPublish'] ?? json['can_publish'] ?? true,
     };
@@ -588,6 +590,7 @@ class ApiTeacherDataSource implements TeacherDataSource {
       'title': request.title,
       'description': request.description,
       'date': _dateOnly(request.date),
+      'status': request.status.name,
       'published': request.published,
       'imageLink': request.imageLink ?? '',
       'fileLink': request.fileLink ?? '',

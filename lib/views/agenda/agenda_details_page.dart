@@ -74,15 +74,28 @@ class _AgendaDetailsPageState extends State<AgendaDetailsPage> {
                     ),
                     const SizedBox(width: 8),
                     StatusBadge(
-                      label: _item.published
-                          ? context.l10n.published
-                          : context.l10n.draft,
-                      icon: _item.published
-                          ? Icons.public_outlined
-                          : Icons.lock_outline_rounded,
-                      color: _item.published
-                          ? const Color(0xFF2E7D32)
-                          : const Color(0xFFF9A825),
+                      label: switch (_item.status) {
+                        AgendaPublishStatus.published =>
+                          context.l10n.published,
+                        AgendaPublishStatus.saved => context.l10n.saved,
+                        AgendaPublishStatus.draft => context.l10n.draft,
+                      },
+                      icon: switch (_item.status) {
+                        AgendaPublishStatus.published =>
+                          Icons.public_outlined,
+                        AgendaPublishStatus.saved =>
+                          Icons.visibility_outlined,
+                        AgendaPublishStatus.draft =>
+                          Icons.lock_outline_rounded,
+                      },
+                      color: switch (_item.status) {
+                        AgendaPublishStatus.published =>
+                          const Color(0xFF2E7D32),
+                        AgendaPublishStatus.saved =>
+                          const Color(0xFF1565C0),
+                        AgendaPublishStatus.draft =>
+                          const Color(0xFFF9A825),
+                      },
                     ),
                   ],
                 ),
@@ -130,7 +143,6 @@ class _AgendaDetailsPageState extends State<AgendaDetailsPage> {
                 key: const Key('agenda_open_image'),
                 icon: Icons.image_outlined,
                 label: context.l10n.image,
-                filename: _linkLabel(imageLink),
                 previewUrl: _isHttpUrl(imageLink) ? imageLink : null,
                 onTap: () => _openImage(context, imageLink),
               ),
@@ -143,7 +155,6 @@ class _AgendaDetailsPageState extends State<AgendaDetailsPage> {
                 label: fileLink.toLowerCase().endsWith('.pdf')
                     ? context.l10n.pdf
                     : context.l10n.file,
-                filename: _linkLabel(fileLink),
                 onTap: () => _openFile(context, fileLink),
               ),
           ],
@@ -305,17 +316,6 @@ class _AgendaDetailsPageState extends State<AgendaDetailsPage> {
         (uri.scheme == 'http' || uri.scheme == 'https') &&
         uri.host.isNotEmpty;
   }
-
-  static String _linkLabel(String value) {
-    final uri = Uri.tryParse(value);
-    if (uri != null && uri.pathSegments.isNotEmpty) {
-      final name = uri.pathSegments.last;
-      if (name.isNotEmpty) {
-        return name;
-      }
-    }
-    return value;
-  }
 }
 
 class _MetaChip extends StatelessWidget {
@@ -360,14 +360,12 @@ class _AttachmentCard extends StatelessWidget {
     super.key,
     required this.icon,
     required this.label,
-    required this.filename,
     required this.onTap,
     this.previewUrl,
   });
 
   final IconData icon;
   final String label;
-  final String filename;
   final VoidCallback onTap;
   final String? previewUrl;
 
@@ -397,21 +395,7 @@ class _AttachmentCard extends StatelessWidget {
                 _AttachmentIcon(icon: icon),
               const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(label, style: context.textStyles.titleSmall),
-                    const SizedBox(height: 2),
-                    Text(
-                      filename,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: context.textStyles.bodySmall?.copyWith(
-                        color: context.colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
+                child: Text(label, style: context.textStyles.titleSmall),
               ),
               Icon(
                 Icons.open_in_new_rounded,

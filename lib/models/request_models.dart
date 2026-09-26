@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:my_school_teacher/models/grade_assessment.dart';
+import 'package:my_school_teacher/models/teacher_agenda_item.dart';
 import 'package:my_school_teacher/models/teacher_notice.dart';
 
 class UpsertAgendaRequest extends Equatable {
@@ -11,7 +12,7 @@ class UpsertAgendaRequest extends Equatable {
     required this.date,
     this.imageLink,
     this.fileLink,
-    this.published = false,
+    this.status = AgendaPublishStatus.saved,
   });
 
   final int assignmentId;
@@ -21,7 +22,9 @@ class UpsertAgendaRequest extends Equatable {
   final DateTime date;
   final String? imageLink;
   final String? fileLink;
-  final bool published;
+  final AgendaPublishStatus status;
+
+  bool get published => status == AgendaPublishStatus.published;
 
   Map<String, dynamic> toJson() => {
     'assignment_id': assignmentId,
@@ -31,6 +34,7 @@ class UpsertAgendaRequest extends Equatable {
     'date': date.toIso8601String(),
     'image_link': imageLink,
     'file_link': fileLink,
+    'status': status.name,
     'published': published,
   };
 
@@ -43,7 +47,7 @@ class UpsertAgendaRequest extends Equatable {
     date,
     imageLink,
     fileLink,
-    published,
+    status,
   ];
 }
 

@@ -208,15 +208,30 @@ class _AgendaCard extends StatelessWidget {
                                 color: context.colors.primary,
                               ),
                             StatusBadge(
-                              label: item.published
-                                  ? context.l10n.published
-                                  : context.l10n.draft,
-                              icon: item.published
-                                  ? Icons.public_outlined
-                                  : Icons.lock_outline_rounded,
-                              color: item.published
-                                  ? const Color(0xFF2E7D32)
-                                  : const Color(0xFFF9A825),
+                              label: switch (item.status) {
+                                AgendaPublishStatus.published =>
+                                  context.l10n.published,
+                                AgendaPublishStatus.saved =>
+                                  context.l10n.saved,
+                                AgendaPublishStatus.draft =>
+                                  context.l10n.draft,
+                              },
+                              icon: switch (item.status) {
+                                AgendaPublishStatus.published =>
+                                  Icons.public_outlined,
+                                AgendaPublishStatus.saved =>
+                                  Icons.visibility_outlined,
+                                AgendaPublishStatus.draft =>
+                                  Icons.lock_outline_rounded,
+                              },
+                              color: switch (item.status) {
+                                AgendaPublishStatus.published =>
+                                  const Color(0xFF2E7D32),
+                                AgendaPublishStatus.saved =>
+                                  const Color(0xFF1565C0),
+                                AgendaPublishStatus.draft =>
+                                  const Color(0xFFF9A825),
+                              },
                             ),
                           ],
                         ),

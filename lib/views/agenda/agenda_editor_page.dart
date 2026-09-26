@@ -26,7 +26,6 @@ class AgendaEditorPage extends StatefulWidget {
 }
 
 class _AgendaEditorPageState extends State<AgendaEditorPage> {
-  final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   DateTime _selectedDate = DateTime.now();
@@ -47,19 +46,17 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
     if (item == null) {
       return;
     }
-    _titleController.text = item.title;
     _descriptionController.text = item.description;
     _selectedDate = item.date;
     _selectedAssignmentId = item.assignmentId == 0 ? null : item.assignmentId;
     _imageUrl = item.imageLink;
-    _imageName = item.imageLink;
+    _imageName = _attachmentDisplayName(item.imageLink);
     _pdfUrl = item.fileLink;
-    _pdfName = item.fileLink;
+    _pdfName = _attachmentDisplayName(item.fileLink);
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
@@ -183,19 +180,6 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
-                        controller: _titleController,
-                        textCapitalization: TextCapitalization.sentences,
-                        decoration: InputDecoration(
-                          labelText: context.l10n.titleLabel,
-                          isDense: true,
-                        ),
-                        validator: (value) =>
-                            value == null || value.trim().isEmpty
-                            ? context.l10n.fieldRequired
-                            : null,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
                         controller: _descriptionController,
                         maxLines: 4,
                         textCapitalization: TextCapitalization.sentences,
@@ -228,7 +212,7 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
                         title: context.l10n.attachImage,
                         subtitle: _uploadingImage
                             ? context.l10n.uploading
-                            : (_imageName ?? context.l10n.chooseImage),
+                            : (_imageUrl != null ? '' : context.l10n.chooseImage),
                         selected: _imageUrl != null,
                         uploading: _uploadingImage,
                         onClear: () => setState(() {
@@ -244,7 +228,7 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
                         title: context.l10n.attachPdf,
                         subtitle: _uploadingPdf
                             ? context.l10n.uploading
-                            : (_pdfName ?? context.l10n.choosePdf),
+                            : (_pdfUrl != null ? '' : context.l10n.choosePdf),
                         selected: _pdfUrl != null,
                         uploading: _uploadingPdf,
                         onClear: () => setState(() {
@@ -352,10 +336,10 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
       }
       setState(() {
         if (kind == 'image') {
-          _imageName = file.name;
+          _imageName = _attachmentDisplayName(file.name) ?? file.name;
           _imageUrl = url;
         } else {
-          _pdfName = file.name;
+          _pdfName = _attachmentDisplayName(file.name) ?? file.name;
           _pdfUrl = url;
         }
       });
@@ -384,6 +368,26 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
     return extensions.any((ext) => lower.endsWith('.$ext'));
   }
 
+  /// Shows a short file name instead of the full upload URL.
+  static String? _attachmentDisplayName(String? value) {
+    final raw = value?.trim() ?? '';
+    if (raw.isEmpty) {
+      return null;
+    }
+    final uri = Uri.tryParse(raw);
+    final segment = (uri != null && uri.pathSegments.isNotEmpty)
+        ? uri.pathSegments.last
+        : raw.split(RegExp(r'[\\/]')).last;
+    if (segment.isEmpty) {
+      return raw;
+    }
+    try {
+      return Uri.decodeComponent(segment);
+    } on FormatException {
+      return segment;
+    }
+  }
+
   bool get _canPublish => widget.item?.canPublish ?? widget.canPublish;
 
   Widget _editorActions(
@@ -391,12 +395,14 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
     required bool busy,
     required bool submitting,
   }) {
-    final keepPublished = widget.item?.published == true;
-    if (keepPublished || !_canPublish) {
+    final isPublished = widget.item?.published == true;
+    if (isPublished) {
       return SizedBox(
         width: double.infinity,
         child: FilledButton(
-          onPressed: busy ? null : () => _submit(published: keepPublished),
+          onPressed: busy
+              ? null
+              : () => _submit(status: AgendaPublishStatus.published),
           child: submitting
               ? const SizedBox.square(
                   dimension: 22,
@@ -406,34 +412,51 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
         ),
       );
     }
-    return Row(
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(
-          child: OutlinedButton(
-            style: OutlinedButton.styleFrom(
+        OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(64, 52),
+          ),
+          onPressed: busy
+              ? null
+              : () => _submit(status: AgendaPublishStatus.draft),
+          child: Text(context.l10n.saveAsDraft),
+        ),
+        const SizedBox(height: 10),
+        FilledButton.tonal(
+          style: FilledButton.styleFrom(
+            minimumSize: const Size(64, 52),
+          ),
+          onPressed: busy
+              ? null
+              : () => _submit(status: AgendaPublishStatus.saved),
+          child: submitting
+              ? const SizedBox.square(
+                  dimension: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(context.l10n.save),
+        ),
+        if (_canPublish) ...[
+          const SizedBox(height: 10),
+          FilledButton(
+            style: FilledButton.styleFrom(
               minimumSize: const Size(64, 52),
             ),
-            onPressed: busy ? null : () => _submit(published: false),
-            child: Text(context.l10n.save),
+            onPressed: busy
+                ? null
+                : () => _submit(status: AgendaPublishStatus.published),
+            child: Text(context.l10n.publish),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: FilledButton(
-            onPressed: busy ? null : () => _submit(published: true),
-            child: submitting
-                ? const SizedBox.square(
-                    dimension: 22,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(context.l10n.publish),
-          ),
-        ),
+        ],
       ],
     );
   }
 
-  void _submit({required bool published}) {
+  void _submit({required AgendaPublishStatus status}) {
     if (!_formKey.currentState!.validate() || _selectedAssignmentId == null) {
       return;
     }
@@ -445,12 +468,17 @@ class _AgendaEditorPageState extends State<AgendaEditorPage> {
     final request = UpsertAgendaRequest(
       assignmentId: assignment.id,
       classId: assignment.classId,
-      title: _titleController.text.trim(),
+      // Title field was removed from the form; keep API happy with the course name.
+      title: assignment.courseTitle.trim().isEmpty
+          ? (widget.item?.title.trim().isNotEmpty == true
+                ? widget.item!.title.trim()
+                : 'Agenda')
+          : assignment.courseTitle.trim(),
       description: _descriptionController.text.trim(),
       date: _selectedDate,
       imageLink: _imageUrl,
       fileLink: _pdfUrl,
-      published: published,
+      status: status,
     );
     final controller = context.read<AgendaComposerController>();
     final item = widget.item;

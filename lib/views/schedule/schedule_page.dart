@@ -148,10 +148,12 @@ class _ScheduleTable extends StatelessWidget {
   }
 
   List<TeacherScheduleDay> _orderedDays() {
-    final daysByName = {for (final day in schedule.days) day.dayName: day};
+    final daysByName = {
+      for (final day in schedule.days) day.dayName.trim().toLowerCase(): day,
+    };
     return [
       for (var index = 0; index < _weekDays.length; index++)
-        daysByName[_weekDays[index]] ??
+        daysByName[_weekDays[index].toLowerCase()] ??
             TeacherScheduleDay(
               dayName: _weekDays[index],
               position: index + 1,
@@ -217,10 +219,13 @@ class _BodyCell extends StatelessWidget {
 
 String _shortDayName(String dayName) {
   final trimmed = dayName.trim();
-  if (trimmed.length <= 3) {
+  if (trimmed.isEmpty) {
     return trimmed;
   }
-  return trimmed.substring(0, 3);
+  final short = trimmed.length <= 3
+      ? trimmed
+      : trimmed.substring(0, 3);
+  return '${short[0].toUpperCase()}${short.substring(1).toLowerCase()}';
 }
 
 String _compactClassSectionLabel(String label) {

@@ -251,7 +251,9 @@ class FcmPushNotificationService implements PushNotificationService {
           );
         }
       }
-      if (defaultTargetPlatform == TargetPlatform.iOS) {
+      // APNs is native iOS only. On iPhone Safari/PWA web, this must be skipped
+      // or getToken() always returns null and the UI shows a false "blocked" error.
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
         final apns = await _messagingInstance.getAPNSToken();
         if (apns == null) {
           return null;
@@ -261,7 +263,20 @@ class FcmPushNotificationService implements PushNotificationService {
         if (prompt) {
           final allowed = await requestPermission();
           if (!allowed) {
-            return null;
+            if (defaultTargetPlatform == TargetPlatform.iOS) {
+              throw StateError(
+                'Notifications are off for this app. On iPhone: Settings → '
+                'Notifications → MS Teacher → allow Notifications, then open '
+                'the home-screen app again and tap Allow notifications.',
+              );
+            }
+            throw StateError(
+              'Notifications are blocked for this site.\n'
+              'Desktop: click the lock icon in the address bar → Site settings → '
+              'Notifications → Allow, then reload and try again.\n'
+              'Android Chrome: tap the lock icon → Permissions → Notifications → Allow.\n'
+              'Or open chrome://settings/content/notifications and remove this site from Blocked.',
+            );
           }
         } else {
           final settings = await _messagingInstance.getNotificationSettings();

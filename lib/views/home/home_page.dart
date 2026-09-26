@@ -249,8 +249,9 @@ class _WebNotificationBannerState extends State<_WebNotificationBanner> {
         }
         setState(() {
           _busy = false;
-          _error =
-              'Chrome did not allow notifications. Click the lock icon, set Notifications to Allow, then try again.';
+          _error = defaultTargetPlatform == TargetPlatform.iOS
+              ? 'Could not enable notifications. Open MS Teacher from the home-screen icon (Safari → Add to Home Screen), then try again. iOS 16.4+ is required.'
+              : 'Chrome did not allow notifications. Click the lock icon, set Notifications to Allow, then try again.';
         });
         return;
       }

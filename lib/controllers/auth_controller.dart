@@ -5,7 +5,14 @@ import 'package:my_school_teacher/models/account.dart';
 import 'package:my_school_teacher/services/network/teacher_api_client.dart';
 import 'package:my_school_teacher/services/repositories/teacher_repository.dart';
 
-enum AuthStatus { initial, loading, unauthenticated, authenticated, failure }
+enum AuthStatus {
+  initial,
+  restoring,
+  loading,
+  unauthenticated,
+  authenticated,
+  failure,
+}
 
 class AuthState extends Equatable {
   const AuthState({
@@ -48,7 +55,7 @@ class AuthController extends NotifierController<AuthState> {
       emit(const AuthState(status: AuthStatus.unauthenticated));
       return;
     }
-    emit(const AuthState(status: AuthStatus.loading));
+    emit(const AuthState(status: AuthStatus.restoring));
     try {
       final account = await _repository.currentAccount();
       emit(AuthState(status: AuthStatus.authenticated, account: account));

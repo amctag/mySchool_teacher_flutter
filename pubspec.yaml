@@ -1,7 +1,7 @@
 name: my_school_teacher
 description: "Makarem Preparatory School teacher app."
 publish_to: 'none'
-version: 7.0.0+7
+version: 9.0.0+10
 
 environment:
   sdk: ^3.10.7
@@ -13,8 +13,6 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   equatable: ^2.0.7
-  flutter_web_plugins:
-    sdk: flutter
   intl: ^0.20.2
   shared_preferences: ^2.5.3
   url_launcher: ^6.3.2
@@ -24,7 +22,6 @@ dependencies:
   firebase_messaging: ^16.6.0
   flutter_local_notifications: ^22.3.0
   file_picker: ^12.2.0
-  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -35,6 +32,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+
   assets:
     - images/icon.png
 

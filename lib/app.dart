@@ -154,7 +154,7 @@ class _SessionGateState extends State<_SessionGate> {
         }
         switch (status) {
           case AuthStatus.initial:
-          case AuthStatus.loading:
+          case AuthStatus.restoring:
             return const _SplashPage();
           case AuthStatus.authenticated:
             return MultiProvider(
@@ -174,6 +174,7 @@ class _SessionGateState extends State<_SessionGate> {
               ],
               child: HomePage(account: auth.state.account!),
             );
+          case AuthStatus.loading:
           case AuthStatus.unauthenticated:
           case AuthStatus.failure:
             return const LoginPage();
@@ -190,6 +191,7 @@ class _SessionGateState extends State<_SessionGate> {
     }
     switch (status) {
       case AuthStatus.initial:
+      case AuthStatus.restoring:
       case AuthStatus.loading:
         return;
       case AuthStatus.authenticated:
